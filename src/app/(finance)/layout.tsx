@@ -38,7 +38,7 @@ export default async function FinanceLayout({
           <span className="text-sm font-medium text-emerald-700">
             NM Finance
           </span>
-          <span className="mt-1 block text-2xl font-semibold tracking-tight">
+          <span className="mt-1 block text-2xl font-semibold">
             Money Tracker
           </span>
         </Link>
@@ -51,7 +51,7 @@ export default async function FinanceLayout({
           ))}
         </nav>
 
-        <div className="absolute inset-x-6 bottom-6 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+        <div className="absolute inset-x-6 bottom-6 rounded-lg border border-slate-200 bg-slate-50 p-4">
           <div className="flex items-center gap-3">
             {user.image ? (
               <Image
@@ -89,7 +89,7 @@ export default async function FinanceLayout({
       <div className="md:pl-72">
         <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur md:hidden">
           <div className="flex items-center justify-between gap-4">
-            <Link href="/dashboard" className="font-semibold tracking-tight">
+            <Link href="/dashboard" className="font-semibold">
               NM Finance
             </Link>
 

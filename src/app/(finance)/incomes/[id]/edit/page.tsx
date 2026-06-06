@@ -23,7 +23,7 @@ export default async function EditIncomePage({ params }: EditIncomePageProps) {
   return (
     <section className="animate-in max-w-xl space-y-6">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight">Edit Income</h1>
+        <h1 className="text-3xl font-semibold">Edit Income</h1>
         <p className="mt-1 text-sm text-slate-500">
           Update this income record and keep reports in sync.
         </p>

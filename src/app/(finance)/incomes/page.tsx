@@ -14,7 +14,7 @@ export default async function IncomesPage() {
     <section className="animate-in space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight">Incomes</h1>
+          <h1 className="text-3xl font-semibold">Incomes</h1>
           <p className="mt-1 max-w-lg text-sm text-slate-500">
             Track salary, freelance payments, scholarships, and other sources.
           </p>
@@ -69,7 +69,7 @@ export default async function IncomesPage() {
         )}
       </div>
 
-      <div className="hidden overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm md:block">
+      <div className="hidden overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm md:block">
         <table className="w-full text-left text-sm">
           <thead className="bg-slate-100">
             <tr>

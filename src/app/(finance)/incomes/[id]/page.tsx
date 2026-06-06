@@ -25,7 +25,7 @@ export default async function IncomeDetailsPage({
   return (
     <section className="animate-in max-w-2xl space-y-6">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight">
+        <h1 className="text-3xl font-semibold">
           {income.title}
         </h1>
         <p className="mt-1 text-sm text-slate-500">Income details</p>

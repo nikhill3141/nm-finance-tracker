@@ -63,7 +63,7 @@ export default async function DashboardPage({
               year: "numeric",
             })}
           </p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight">
+          <h1 className="mt-1 text-3xl font-semibold">
             Dashboard
           </h1>
           <p className="mt-1 max-w-xl text-sm text-slate-500">
@@ -93,7 +93,7 @@ export default async function DashboardPage({
           <div key={card.label} className="panel p-5">
             <p className="text-sm text-slate-500">{card.label}</p>
             <p
-              className={`mt-2 text-2xl font-semibold tracking-tight ${card.tone}`}
+              className={`mt-2 text-2xl font-semibold ${card.tone}`}
             >
               {card.value}
             </p>

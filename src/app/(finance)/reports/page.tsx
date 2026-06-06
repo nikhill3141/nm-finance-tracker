@@ -1,4 +1,19 @@
+import Link from "next/link";
+
+import { normalizePeriod } from "@/lib/date-filters";
 import { getMonthlyReport } from "@/lib/reports";
+
+type ReportsPageProps = {
+  searchParams: Promise<{
+    period?: string;
+  }>;
+};
+
+const periodLinks = [
+  { label: "This Month", value: "this-month" },
+  { label: "Last Month", value: "last-month" },
+  { label: "All Time", value: "all" },
+];
 
 function formatCurrency(value: number | string) {
   return new Intl.NumberFormat("en-IN", {
@@ -8,16 +23,36 @@ function formatCurrency(value: number | string) {
   }).format(Number(value));
 }
 
-export default async function ReportsPage() {
-  const report = await getMonthlyReport();
+export default async function ReportsPage({ searchParams }: ReportsPageProps) {
+  const params = await searchParams;
+  const period = normalizePeriod(params.period);
+  const report = await getMonthlyReport(period);
 
   return (
     <section className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Monthly Report</h1>
-        <p className="text-sm text-gray-500">
-          Review income, expenses, balance, and largest spending entries.
-        </p>
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold">Monthly Report</h1>
+          <p className="text-sm text-gray-500">
+            Review income, expenses, balance, and largest spending entries.
+          </p>
+        </div>
+
+        <div className="flex gap-2">
+          {periodLinks.map((link) => (
+            <Link
+              key={link.value}
+              href={`/reports?period=${link.value}`}
+              className={`rounded-md border px-3 py-2 text-sm ${
+                report.period === link.value
+                  ? "bg-black text-white"
+                  : "bg-white text-black"
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
@@ -52,7 +87,7 @@ export default async function ReportsPage() {
             {report.sortedExpenses.map((expense) => (
               <div
                 key={expense.id}
-                className="flex items-center justify-between p-4 text-sm"
+                className="flex items-center justify-between gap-4 p-4 text-sm"
               >
                 <div>
                   <p className="font-medium">{expense.title}</p>
@@ -81,7 +116,7 @@ export default async function ReportsPage() {
             {report.sortedIncomes.map((income) => (
               <div
                 key={income.id}
-                className="flex items-center justify-between p-4 text-sm"
+                className="flex items-center justify-between gap-4 p-4 text-sm"
               >
                 <div>
                   <p className="font-medium">{income.title}</p>

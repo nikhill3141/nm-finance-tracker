@@ -1,4 +1,13 @@
+import Link from "next/link";
+
 import { getDashboardAnalytics } from "@/lib/analytics";
+import { normalizePeriod } from "@/lib/date-filters";
+
+type DashboardPageProps = {
+  searchParams: Promise<{
+    period?: string;
+  }>;
+};
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("en-IN", {
@@ -8,8 +17,18 @@ function formatCurrency(value: number) {
   }).format(value);
 }
 
-export default async function DashboardPage() {
-  const analytics = await getDashboardAnalytics();
+const periodLinks = [
+  { label: "This Month", value: "this-month" },
+  { label: "Last Month", value: "last-month" },
+  { label: "All Time", value: "all" },
+];
+
+export default async function DashboardPage({
+  searchParams,
+}: DashboardPageProps) {
+  const params = await searchParams;
+  const period = normalizePeriod(params.period);
+  const analytics = await getDashboardAnalytics(period);
 
   const cards = [
     {
@@ -36,11 +55,29 @@ export default async function DashboardPage() {
 
   return (
     <section className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Dashboard</h1>
-        <p className="text-sm text-gray-500">
-          Your finance summary across income, expenses, and spending patterns.
-        </p>
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold">Dashboard</h1>
+          <p className="text-sm text-gray-500">
+            Your finance summary across income, expenses, and spending patterns.
+          </p>
+        </div>
+
+        <div className="flex gap-2">
+          {periodLinks.map((link) => (
+            <Link
+              key={link.value}
+              href={`/dashboard?period=${link.value}`}
+              className={`rounded-md border px-3 py-2 text-sm ${
+                analytics.period === link.value
+                  ? "bg-black text-white"
+                  : "bg-white text-black"
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">

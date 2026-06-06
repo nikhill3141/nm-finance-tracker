@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { requireUserId } from "@/lib/auth-session";
 import { createExpense, deleteExpense, updateExpense } from "@/lib/expenses";
 
 type ExpenseCategory =
@@ -26,12 +27,14 @@ function getRequiredString(formData: FormData, key: string) {
 }
 
 export async function createExpenseAction(formData: FormData) {
+  const userId = await requireUserId();
   const title = getRequiredString(formData, "title");
   const amount = getRequiredString(formData, "amount");
   const category = getRequiredString(formData, "category") as ExpenseCategory;
   const transactionDate = getRequiredString(formData, "transactionDate");
 
   await createExpense({
+    userId,
     title,
     amount,
     category,
@@ -46,12 +49,13 @@ export async function createExpenseAction(formData: FormData) {
 }
 
 export async function updateExpenseAction(id: string, formData: FormData) {
+  const userId = await requireUserId();
   const title = getRequiredString(formData, "title");
   const amount = getRequiredString(formData, "amount");
   const category = getRequiredString(formData, "category") as ExpenseCategory;
   const transactionDate = getRequiredString(formData, "transactionDate");
 
-  await updateExpense(id, {
+  await updateExpense(id, userId, {
     title,
     amount,
     category,
@@ -68,7 +72,9 @@ export async function updateExpenseAction(id: string, formData: FormData) {
 }
 
 export async function deleteExpenseAction(id: string) {
-  await deleteExpense(id);
+  const userId = await requireUserId();
+
+  await deleteExpense(id, userId);
 
   revalidatePath("/expenses");
   revalidatePath("/dashboard");

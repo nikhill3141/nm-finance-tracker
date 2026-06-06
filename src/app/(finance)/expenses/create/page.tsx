@@ -13,15 +13,15 @@ const categories = [
 
 export default function CreateExpensePage() {
   return (
-    <section className="max-w-xl space-y-6">
+    <section className="animate-in max-w-xl space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Add Expense</h1>
-        <p className="text-sm text-gray-500">
+        <h1 className="text-3xl font-semibold tracking-tight">Add Expense</h1>
+        <p className="mt-1 text-sm text-slate-500">
           Record spending with a category and transaction date.
         </p>
       </div>
 
-      <form action={createExpenseAction} className="space-y-4">
+      <form action={createExpenseAction} className="panel space-y-4 p-5">
         <div className="space-y-2">
           <label htmlFor="title" className="text-sm font-medium">
             Title
@@ -30,7 +30,7 @@ export default function CreateExpensePage() {
             id="title"
             name="title"
             required
-            className="w-full rounded-md border px-3 py-2"
+            className="field"
             placeholder="Metro card recharge"
           />
         </div>
@@ -46,7 +46,7 @@ export default function CreateExpensePage() {
             min="1"
             step="0.01"
             required
-            className="w-full rounded-md border px-3 py-2"
+            className="field"
             placeholder="1500"
           />
         </div>
@@ -55,12 +55,7 @@ export default function CreateExpensePage() {
           <label htmlFor="category" className="text-sm font-medium">
             Category
           </label>
-          <select
-            id="category"
-            name="category"
-            required
-            className="w-full rounded-md border px-3 py-2"
-          >
+          <select id="category" name="category" required className="field">
             {categories.map((category) => (
               <option key={category} value={category}>
                 {category}
@@ -79,14 +74,11 @@ export default function CreateExpensePage() {
             type="date"
             required
             defaultValue={new Date().toISOString().slice(0, 10)}
-            className="w-full rounded-md border px-3 py-2"
+            className="field"
           />
         </div>
 
-        <button
-          type="submit"
-          className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white"
-        >
+        <button type="submit" className="button-primary w-full justify-center">
           Save Expense
         </button>
       </form>

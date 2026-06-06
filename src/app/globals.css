@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8fafc;
+  --foreground: #0f172a;
 }
 
 @theme inline {
@@ -12,15 +12,167 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--background);
 }
 
 body {
+  min-height: 100vh;
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+button,
+a,
+input,
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a {
+  transition:
+    transform 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    color 160ms ease;
+}
+
+button:active,
+a:active {
+  transform: scale(0.98);
+}
+
+:focus-visible {
+  outline: 3px solid rgb(16 185 129 / 0.35);
+  outline-offset: 3px;
+}
+
+.panel {
+  border: 1px solid rgb(226 232 240);
+  border-radius: 1rem;
+  background: rgb(255 255 255);
+  box-shadow: 0 10px 30px rgb(15 23 42 / 0.05);
+}
+
+.field {
+  min-height: 3rem;
+  width: 100%;
+  border-radius: 0.875rem;
+  border: 1px solid rgb(203 213 225);
+  background: white;
+  padding: 0.75rem 0.875rem;
+  font-size: 0.95rem;
+  color: rgb(15 23 42);
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+}
+
+.field::placeholder {
+  color: rgb(148 163 184);
+}
+
+.button-primary {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  border-radius: 999px;
+  background: rgb(15 23 42);
+  padding: 0.7rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: white;
+  box-shadow: 0 12px 26px rgb(15 23 42 / 0.16);
+}
+
+.button-primary:hover {
+  background: rgb(2 6 23);
+  box-shadow: 0 16px 34px rgb(15 23 42 / 0.22);
+}
+
+.button-soft {
+  display: inline-flex;
+  min-height: 2.25rem;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid rgb(226 232 240);
+  background: white;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgb(51 65 85);
+}
+
+.button-soft:hover {
+  border-color: rgb(203 213 225);
+  background: rgb(248 250 252);
+  color: rgb(15 23 42);
+}
+
+.nav-link {
+  border-radius: 1rem;
+  padding: 0.85rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgb(71 85 105);
+}
+
+.nav-link:hover {
+  background: rgb(241 245 249);
+  color: rgb(15 23 42);
+}
+
+.mobile-nav-link {
+  display: grid;
+  min-height: 3rem;
+  place-items: center;
+  border-radius: 999px;
+  padding: 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: rgb(71 85 105);
+}
+
+.mobile-nav-link:hover {
+  background: rgb(241 245 249);
+  color: rgb(15 23 42);
+}
+
+.empty-state {
+  border: 1px dashed rgb(203 213 225);
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.7);
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.animate-in {
+  animation: animate-in 420ms ease both;
+}
+
+@keyframes animate-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
 }

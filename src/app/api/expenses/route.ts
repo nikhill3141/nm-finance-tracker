@@ -1,5 +1,6 @@
 import { createExpense, getExpenses } from "@/lib/expenses";
 import { errorResponse, successResponse } from "@/lib/api-response";
+import { getCurrentUserId } from "@/lib/auth-session";
 
 const expenseCategories = [
   "food",
@@ -30,7 +31,13 @@ function getString(body: Record<string, unknown>, key: string) {
 
 export async function GET() {
   try {
-    const expenses = await getExpenses();
+    const userId = await getCurrentUserId();
+
+    if (!userId) {
+      return errorResponse("Authentication required", 401, "UNAUTHORIZED");
+    }
+
+    const expenses = await getExpenses(userId);
     return successResponse(expenses);
   } catch {
     return errorResponse("Failed to fetch expenses");
@@ -39,6 +46,12 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const userId = await getCurrentUserId();
+
+    if (!userId) {
+      return errorResponse("Authentication required", 401, "UNAUTHORIZED");
+    }
+
     const body = (await request.json()) as Record<string, unknown>;
 
     const title = getString(body, "title");
@@ -50,6 +63,7 @@ export async function POST(request: Request) {
     }
 
     const expense = await createExpense({
+      userId,
       title,
       amount,
       category,

@@ -1,5 +1,6 @@
 import { deleteIncome, getIncomeById, updateIncome } from "@/lib/incomes";
 import { errorResponse, successResponse } from "@/lib/api-response";
+import { getCurrentUserId } from "@/lib/auth-session";
 
 const incomeTypes = ["fixed", "variable"] as const;
 
@@ -27,8 +28,14 @@ function getString(body: Record<string, unknown>, key: string) {
 
 export async function GET(_request: Request, { params }: Params) {
   try {
+    const userId = await getCurrentUserId();
+
+    if (!userId) {
+      return errorResponse("Authentication required", 401, "UNAUTHORIZED");
+    }
+
     const { id } = await params;
-    const income = await getIncomeById(id);
+    const income = await getIncomeById(id, userId);
 
     if (!income) {
       return errorResponse("Income not found", 404, "NOT_FOUND");
@@ -42,6 +49,12 @@ export async function GET(_request: Request, { params }: Params) {
 
 export async function PATCH(request: Request, { params }: Params) {
   try {
+    const userId = await getCurrentUserId();
+
+    if (!userId) {
+      return errorResponse("Authentication required", 401, "UNAUTHORIZED");
+    }
+
     const { id } = await params;
     const body = (await request.json()) as Record<string, unknown>;
 
@@ -54,7 +67,7 @@ export async function PATCH(request: Request, { params }: Params) {
       return errorResponse("Invalid income type", 400, "INVALID_INCOME_TYPE");
     }
 
-    const income = await updateIncome(id, {
+    const income = await updateIncome(id, userId, {
       title,
       sourceName,
       amount,
@@ -80,8 +93,14 @@ export async function PATCH(request: Request, { params }: Params) {
 
 export async function DELETE(_request: Request, { params }: Params) {
   try {
+    const userId = await getCurrentUserId();
+
+    if (!userId) {
+      return errorResponse("Authentication required", 401, "UNAUTHORIZED");
+    }
+
     const { id } = await params;
-    const income = await deleteIncome(id);
+    const income = await deleteIncome(id, userId);
 
     if (!income) {
       return errorResponse("Income not found", 404, "NOT_FOUND");

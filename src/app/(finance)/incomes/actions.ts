@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { requireUserId } from "@/lib/auth-session";
 import { createIncome, deleteIncome, updateIncome } from "@/lib/incomes";
 
 function getRequiredString(formData: FormData, key: string) {
@@ -16,6 +17,7 @@ function getRequiredString(formData: FormData, key: string) {
 }
 
 export async function createIncomeAction(formData: FormData) {
+  const userId = await requireUserId();
   const title = getRequiredString(formData, "title");
   const sourceName = getRequiredString(formData, "sourceName");
   const amount = getRequiredString(formData, "amount");
@@ -25,6 +27,7 @@ export async function createIncomeAction(formData: FormData) {
   const transactionDate = getRequiredString(formData, "transactionDate");
 
   await createIncome({
+    userId,
     title,
     sourceName,
     amount,
@@ -40,6 +43,7 @@ export async function createIncomeAction(formData: FormData) {
 }
 
 export async function updateIncomeAction(id: string, formData: FormData) {
+  const userId = await requireUserId();
   const title = getRequiredString(formData, "title");
   const sourceName = getRequiredString(formData, "sourceName");
   const amount = getRequiredString(formData, "amount");
@@ -48,7 +52,7 @@ export async function updateIncomeAction(id: string, formData: FormData) {
     | "variable";
   const transactionDate = getRequiredString(formData, "transactionDate");
 
-  await updateIncome(id, {
+  await updateIncome(id, userId, {
     title,
     sourceName,
     amount,
@@ -67,7 +71,9 @@ export async function updateIncomeAction(id: string, formData: FormData) {
 }
 
 export async function deleteIncomeAction(id: string) {
-  await deleteIncome(id);
+  const userId = await requireUserId();
+
+  await deleteIncome(id, userId);
 
   revalidatePath("/incomes");
   revalidatePath("/dashboard");

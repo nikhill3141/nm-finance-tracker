@@ -10,8 +10,14 @@ function toNumber(value: string | null | undefined) {
   return Number(value ?? 0);
 }
 
-export async function getMonthlyReport(period: PeriodFilter = "this-month") {
-  const [incomes, expenses] = await Promise.all([getIncomes(), getExpenses()]);
+export async function getMonthlyReport(
+  userId: string,
+  period: PeriodFilter = "this-month",
+) {
+  const [incomes, expenses] = await Promise.all([
+    getIncomes(userId),
+    getExpenses(userId),
+  ]);
   const range = getDateRange(period);
 
   const filteredIncomes = incomes.filter((income) =>

@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { requireUserId } from "@/lib/auth-session";
 import { getExpenseById } from "@/lib/expenses";
+import { formatCurrency } from "@/lib/format";
 
 type ExpenseDetailsPageProps = {
   params: Promise<{
@@ -12,34 +14,39 @@ type ExpenseDetailsPageProps = {
 export default async function ExpenseDetailsPage({
   params,
 }: ExpenseDetailsPageProps) {
+  const userId = await requireUserId();
   const { id } = await params;
-  const expense = await getExpenseById(id);
+  const expense = await getExpenseById(id, userId);
 
   if (!expense) {
     notFound();
   }
 
   return (
-    <section className="max-w-2xl space-y-6">
+    <section className="animate-in max-w-2xl space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">{expense.title}</h1>
-        <p className="text-sm text-gray-500">Expense details</p>
+        <h1 className="text-3xl font-semibold tracking-tight">
+          {expense.title}
+        </h1>
+        <p className="mt-1 text-sm text-slate-500">Expense details</p>
       </div>
 
-      <div className="rounded-lg border p-6">
+      <div className="panel p-6">
         <dl className="grid gap-4 sm:grid-cols-2">
           <div>
-            <dt className="text-sm text-gray-500">Category</dt>
+            <dt className="text-sm text-slate-500">Category</dt>
             <dd className="font-medium capitalize">{expense.category}</dd>
           </div>
 
           <div>
-            <dt className="text-sm text-gray-500">Amount</dt>
-            <dd className="font-medium">₹{expense.amount}</dd>
+            <dt className="text-sm text-slate-500">Amount</dt>
+            <dd className="font-medium text-rose-700">
+              {formatCurrency(expense.amount)}
+            </dd>
           </div>
 
           <div>
-            <dt className="text-sm text-gray-500">Transaction Date</dt>
+            <dt className="text-sm text-slate-500">Transaction Date</dt>
             <dd className="font-medium">
               {expense.transactionDate.toLocaleDateString("en-IN")}
             </dd>
@@ -48,14 +55,11 @@ export default async function ExpenseDetailsPage({
       </div>
 
       <div className="flex gap-2">
-        <Link href="/expenses" className="rounded-md border px-4 py-2 text-sm">
+        <Link href="/expenses" className="button-soft">
           Back
         </Link>
 
-        <Link
-          href={`/expenses/${expense.id}/edit`}
-          className="rounded-md bg-black px-4 py-2 text-sm text-white"
-        >
+        <Link href={`/expenses/${expense.id}/edit`} className="button-primary">
           Edit
         </Link>
       </div>

@@ -1,5 +1,6 @@
 import { createIncome, getIncomes } from "@/lib/incomes";
 import { errorResponse, successResponse } from "@/lib/api-response";
+import { getCurrentUserId } from "@/lib/auth-session";
 
 const incomeTypes = ["fixed", "variable"] as const;
 
@@ -21,7 +22,13 @@ function getString(body: Record<string, unknown>, key: string) {
 
 export async function GET() {
   try {
-    const incomes = await getIncomes();
+    const userId = await getCurrentUserId();
+
+    if (!userId) {
+      return errorResponse("Authentication required", 401, "UNAUTHORIZED");
+    }
+
+    const incomes = await getIncomes(userId);
     return successResponse(incomes);
   } catch {
     return errorResponse("Failed to fetch incomes");
@@ -30,6 +37,12 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const userId = await getCurrentUserId();
+
+    if (!userId) {
+      return errorResponse("Authentication required", 401, "UNAUTHORIZED");
+    }
+
     const body = (await request.json()) as Record<string, unknown>;
 
     const title = getString(body, "title");
@@ -42,6 +55,7 @@ export async function POST(request: Request) {
     }
 
     const income = await createIncome({
+      userId,
       title,
       sourceName,
       amount,

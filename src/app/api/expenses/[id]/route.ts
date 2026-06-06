@@ -1,5 +1,6 @@
 import { deleteExpense, getExpenseById, updateExpense } from "@/lib/expenses";
 import { errorResponse, successResponse } from "@/lib/api-response";
+import { getCurrentUserId } from "@/lib/auth-session";
 
 const expenseCategories = [
   "food",
@@ -36,8 +37,14 @@ function getString(body: Record<string, unknown>, key: string) {
 
 export async function GET(_request: Request, { params }: Params) {
   try {
+    const userId = await getCurrentUserId();
+
+    if (!userId) {
+      return errorResponse("Authentication required", 401, "UNAUTHORIZED");
+    }
+
     const { id } = await params;
-    const expense = await getExpenseById(id);
+    const expense = await getExpenseById(id, userId);
 
     if (!expense) {
       return errorResponse("Expense not found", 404, "NOT_FOUND");
@@ -51,6 +58,12 @@ export async function GET(_request: Request, { params }: Params) {
 
 export async function PATCH(request: Request, { params }: Params) {
   try {
+    const userId = await getCurrentUserId();
+
+    if (!userId) {
+      return errorResponse("Authentication required", 401, "UNAUTHORIZED");
+    }
+
     const { id } = await params;
     const body = (await request.json()) as Record<string, unknown>;
 
@@ -62,7 +75,7 @@ export async function PATCH(request: Request, { params }: Params) {
       return errorResponse("Invalid expense category", 400, "INVALID_CATEGORY");
     }
 
-    const expense = await updateExpense(id, {
+    const expense = await updateExpense(id, userId, {
       title,
       amount,
       category,
@@ -87,8 +100,14 @@ export async function PATCH(request: Request, { params }: Params) {
 
 export async function DELETE(_request: Request, { params }: Params) {
   try {
+    const userId = await getCurrentUserId();
+
+    if (!userId) {
+      return errorResponse("Authentication required", 401, "UNAUTHORIZED");
+    }
+
     const { id } = await params;
-    const expense = await deleteExpense(id);
+    const expense = await deleteExpense(id, userId);
 
     if (!expense) {
       return errorResponse("Expense not found", 404, "NOT_FOUND");

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { requireUserId } from "@/lib/auth-session";
 import { getExpenseById } from "@/lib/expenses";
 
 import { updateExpenseAction } from "../../actions";
@@ -24,25 +25,26 @@ type EditExpensePageProps = {
 export default async function EditExpensePage({
   params,
 }: EditExpensePageProps) {
+  const userId = await requireUserId();
   const { id } = await params;
-  const expense = await getExpenseById(id);
+  const expense = await getExpenseById(id, userId);
 
   if (!expense) {
     notFound();
   }
 
   return (
-    <section className="max-w-xl space-y-6">
+    <section className="animate-in max-w-xl space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Edit Expense</h1>
-        <p className="text-sm text-gray-500">
+        <h1 className="text-3xl font-semibold tracking-tight">Edit Expense</h1>
+        <p className="mt-1 text-sm text-slate-500">
           Update this spending record and refresh analytics.
         </p>
       </div>
 
       <form
         action={updateExpenseAction.bind(null, expense.id)}
-        className="space-y-4"
+        className="panel space-y-4 p-5"
       >
         <div className="space-y-2">
           <label htmlFor="title" className="text-sm font-medium">
@@ -53,7 +55,7 @@ export default async function EditExpensePage({
             name="title"
             required
             defaultValue={expense.title}
-            className="w-full rounded-md border px-3 py-2"
+            className="field"
           />
         </div>
 
@@ -69,7 +71,7 @@ export default async function EditExpensePage({
             step="0.01"
             required
             defaultValue={expense.amount}
-            className="w-full rounded-md border px-3 py-2"
+            className="field"
           />
         </div>
 
@@ -82,7 +84,7 @@ export default async function EditExpensePage({
             name="category"
             required
             defaultValue={expense.category}
-            className="w-full rounded-md border px-3 py-2"
+            className="field"
           >
             {categories.map((category) => (
               <option key={category} value={category}>
@@ -102,14 +104,11 @@ export default async function EditExpensePage({
             type="date"
             required
             defaultValue={expense.transactionDate.toISOString().slice(0, 10)}
-            className="w-full rounded-md border px-3 py-2"
+            className="field"
           />
         </div>
 
-        <button
-          type="submit"
-          className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white"
-        >
+        <button type="submit" className="button-primary w-full justify-center">
           Update Expense
         </button>
       </form>

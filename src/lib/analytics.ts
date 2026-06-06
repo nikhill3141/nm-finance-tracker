@@ -11,9 +11,13 @@ function toNumber(value: string | null | undefined) {
 }
 
 export async function getDashboardAnalytics(
+  userId: string,
   period: PeriodFilter = "this-month",
 ) {
-  const [incomes, expenses] = await Promise.all([getIncomes(), getExpenses()]);
+  const [incomes, expenses] = await Promise.all([
+    getIncomes(userId),
+    getExpenses(userId),
+  ]);
   const range = getDateRange(period);
 
   const filteredIncomes = incomes.filter((income) =>

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { requireUserId } from "@/lib/auth-session";
 import { getIncomeById } from "@/lib/incomes";
 
 import { updateIncomeAction } from "../../actions";
@@ -11,25 +12,26 @@ type EditIncomePageProps = {
 };
 
 export default async function EditIncomePage({ params }: EditIncomePageProps) {
+  const userId = await requireUserId();
   const { id } = await params;
-  const income = await getIncomeById(id);
+  const income = await getIncomeById(id, userId);
 
   if (!income) {
     notFound();
   }
 
   return (
-    <section className="max-w-xl space-y-6">
+    <section className="animate-in max-w-xl space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Edit Income</h1>
-        <p className="text-sm text-gray-500">
+        <h1 className="text-3xl font-semibold tracking-tight">Edit Income</h1>
+        <p className="mt-1 text-sm text-slate-500">
           Update this income record and keep reports in sync.
         </p>
       </div>
 
       <form
         action={updateIncomeAction.bind(null, income.id)}
-        className="space-y-4"
+        className="panel space-y-4 p-5"
       >
         <div className="space-y-2">
           <label htmlFor="title" className="text-sm font-medium">
@@ -40,7 +42,7 @@ export default async function EditIncomePage({ params }: EditIncomePageProps) {
             name="title"
             required
             defaultValue={income.title}
-            className="w-full rounded-md border px-3 py-2"
+            className="field"
           />
         </div>
 
@@ -53,7 +55,7 @@ export default async function EditIncomePage({ params }: EditIncomePageProps) {
             name="sourceName"
             required
             defaultValue={income.sourceName}
-            className="w-full rounded-md border px-3 py-2"
+            className="field"
           />
         </div>
 
@@ -69,7 +71,7 @@ export default async function EditIncomePage({ params }: EditIncomePageProps) {
             step="0.01"
             required
             defaultValue={income.amount}
-            className="w-full rounded-md border px-3 py-2"
+            className="field"
           />
         </div>
 
@@ -82,7 +84,7 @@ export default async function EditIncomePage({ params }: EditIncomePageProps) {
             name="incomeType"
             required
             defaultValue={income.incomeType}
-            className="w-full rounded-md border px-3 py-2"
+            className="field"
           >
             <option value="fixed">Fixed</option>
             <option value="variable">Variable</option>
@@ -99,14 +101,11 @@ export default async function EditIncomePage({ params }: EditIncomePageProps) {
             type="date"
             required
             defaultValue={income.transactionDate.toISOString().slice(0, 10)}
-            className="w-full rounded-md border px-3 py-2"
+            className="field"
           />
         </div>
 
-        <button
-          type="submit"
-          className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white"
-        >
+        <button type="submit" className="button-primary w-full justify-center">
           Update Income
         </button>
       </form>

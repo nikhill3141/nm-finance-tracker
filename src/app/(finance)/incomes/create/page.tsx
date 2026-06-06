@@ -2,15 +2,15 @@ import { createIncomeAction } from "../actions";
 
 export default function CreateIncomePage() {
   return (
-    <section className="max-w-xl space-y-6">
+    <section className="animate-in max-w-xl space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Add Income</h1>
-        <p className="text-sm text-gray-500">
+        <h1 className="text-3xl font-semibold tracking-tight">Add Income</h1>
+        <p className="mt-1 text-sm text-slate-500">
           Record a source of money for the selected transaction date.
         </p>
       </div>
 
-      <form action={createIncomeAction} className="space-y-4">
+      <form action={createIncomeAction} className="panel space-y-4 p-5">
         <div className="space-y-2">
           <label htmlFor="title" className="text-sm font-medium">
             Title
@@ -19,7 +19,7 @@ export default function CreateIncomePage() {
             id="title"
             name="title"
             required
-            className="w-full rounded-md border px-3 py-2"
+            className="field"
             placeholder="June salary"
           />
         </div>
@@ -32,8 +32,8 @@ export default function CreateIncomePage() {
             id="sourceName"
             name="sourceName"
             required
-            className="w-full rounded-md border px-3 py-2"
-            placeholder="Company, freelance client, scholarship"
+            className="field"
+            placeholder="Company, client, scholarship"
           />
         </div>
 
@@ -48,7 +48,7 @@ export default function CreateIncomePage() {
             min="1"
             step="0.01"
             required
-            className="w-full rounded-md border px-3 py-2"
+            className="field"
             placeholder="50000"
           />
         </div>
@@ -57,12 +57,7 @@ export default function CreateIncomePage() {
           <label htmlFor="incomeType" className="text-sm font-medium">
             Income Type
           </label>
-          <select
-            id="incomeType"
-            name="incomeType"
-            required
-            className="w-full rounded-md border px-3 py-2"
-          >
+          <select id="incomeType" name="incomeType" required className="field">
             <option value="fixed">Fixed</option>
             <option value="variable">Variable</option>
           </select>
@@ -78,14 +73,11 @@ export default function CreateIncomePage() {
             type="date"
             required
             defaultValue={new Date().toISOString().slice(0, 10)}
-            className="w-full rounded-md border px-3 py-2"
+            className="field"
           />
         </div>
 
-        <button
-          type="submit"
-          className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white"
-        >
+        <button type="submit" className="button-primary w-full justify-center">
           Save Income
         </button>
       </form>

@@ -13,10 +13,17 @@ const expenseCategories = [
   "other",
 ] as const;
 
+const expensePaymentModes = ["cash", "online"] as const;
+
 type ExpenseCategory = (typeof expenseCategories)[number];
+type ExpensePaymentMode = (typeof expensePaymentModes)[number];
 
 function isExpenseCategory(value: string): value is ExpenseCategory {
   return expenseCategories.includes(value as ExpenseCategory);
+}
+
+function isExpensePaymentMode(value: string): value is ExpensePaymentMode {
+  return expensePaymentModes.includes(value as ExpensePaymentMode);
 }
 
 function getString(body: Record<string, unknown>, key: string) {
@@ -57,9 +64,16 @@ export async function POST(request: Request) {
     const title = getString(body, "title");
     const amount = getString(body, "amount");
     const category = getString(body, "category");
+    const paymentMode = body.paymentMode
+      ? getString(body, "paymentMode")
+      : "cash";
 
     if (!isExpenseCategory(category)) {
       return errorResponse("Invalid expense category", 400, "INVALID_CATEGORY");
+    }
+
+    if (!isExpensePaymentMode(paymentMode)) {
+      return errorResponse("Invalid payment mode", 400, "INVALID_PAYMENT_MODE");
     }
 
     const expense = await createExpense({
@@ -67,6 +81,7 @@ export async function POST(request: Request) {
       title,
       amount,
       category,
+      paymentMode,
       transactionDate: body.transactionDate
         ? new Date(getString(body, "transactionDate"))
         : new Date(),

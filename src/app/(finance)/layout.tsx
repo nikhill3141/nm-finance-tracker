@@ -7,7 +7,7 @@ import { auth, signOut } from "@/auth";
 const navItems = [
   { href: "/dashboard", label: "Dashboard", shortLabel: "Home" },
   { href: "/incomes", label: "Incomes", shortLabel: "Income" },
-  { href: "/expenses", label: "Expenses", shortLabel: "Spend" },
+  { href: "/expenses", label: "Expenses", shortLabel: "Expenses" },
   { href: "/reports", label: "Reports", shortLabel: "Reports" },
 ];
 
@@ -45,7 +45,7 @@ export default async function FinanceLayout({
 
         <nav className="mt-8 flex flex-col gap-2">
           {navItems.map((item) => (
-            <Link key={item.href} href={item.href} className="nav-link">
+            <Link key={item.href} href={item.href} prefetch className="nav-link">
               {item.label}
             </Link>
           ))}
@@ -119,18 +119,29 @@ export default async function FinanceLayout({
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 px-3 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-2 shadow-[0_-12px_30px_rgba(15,23,42,0.08)] backdrop-blur md:hidden">
         <div className="mx-auto grid max-w-md grid-cols-5 gap-1">
           {navItems.slice(0, 2).map((item) => (
-            <Link key={item.href} href={item.href} className="mobile-nav-link">
+            <Link
+              key={item.href}
+              href={item.href}
+              prefetch
+              className="mobile-nav-link"
+            >
               {item.shortLabel}
             </Link>
           ))}
           <Link
             href="/expenses/create"
+            prefetch
             className="grid min-h-12 place-items-center rounded-full bg-slate-950 px-3 text-sm font-semibold text-white shadow-lg shadow-slate-300 active:scale-95"
           >
             Add
           </Link>
           {navItems.slice(2).map((item) => (
-            <Link key={item.href} href={item.href} className="mobile-nav-link">
+            <Link
+              key={item.href}
+              href={item.href}
+              prefetch
+              className="mobile-nav-link"
+            >
               {item.shortLabel}
             </Link>
           ))}

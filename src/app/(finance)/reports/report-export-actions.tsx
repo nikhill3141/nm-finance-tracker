@@ -4,9 +4,12 @@ import { Download, FileSpreadsheet, FileText } from "lucide-react";
 import { jsPDF } from "jspdf";
 
 type ReportRow = {
+  type: "Income" | "Expense";
   title: string;
-  detail: string;
+  categoryOrSource: string;
+  paymentMode: string;
   amount: number;
+  signedAmount: number;
   date: string;
 };
 
@@ -18,8 +21,7 @@ type ReportExportActionsProps = {
     totalExpenses: number;
     balance: number;
   };
-  incomes: ReportRow[];
-  expenses: ReportRow[];
+  rows: ReportRow[];
 };
 
 function formatCurrency(value: number) {
@@ -53,8 +55,7 @@ export function ReportExportActions({
   periodLabel,
   generatedAt,
   summary,
-  incomes,
-  expenses,
+  rows,
 }: ReportExportActionsProps) {
   const fileSafePeriod = periodLabel.toLowerCase().replace(/\s+/g, "-");
 
@@ -63,95 +64,110 @@ export function ReportExportActions({
     const margin = 16;
     let y = 18;
 
+    const tableTop = () => {
+      doc.setFillColor(248, 250, 252);
+      doc.rect(margin, y, 178, 9, "F");
+      doc.setDrawColor(203, 213, 225);
+      doc.line(margin, y + 9, 194, y + 9);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8);
+      doc.text("Date", margin + 2, y + 6);
+      doc.text("Type", margin + 26, y + 6);
+      doc.text("Description", margin + 50, y + 6);
+      doc.text("Mode", margin + 112, y + 6);
+      doc.text("Amount", 192, y + 6, { align: "right" });
+      y += 11;
+      doc.setFont("helvetica", "normal");
+    };
+
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
     doc.text("NM Finance Tracker", margin, y);
-
     y += 9;
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
-    doc.text(`${periodLabel} report`, margin, y);
+    doc.text(`${periodLabel} cash flow statement`, margin, y);
     doc.text(`Generated: ${generatedAt}`, margin, y + 6);
 
     y += 20;
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(12);
-    doc.text("Summary", margin, y);
+    tableTop();
 
-    y += 8;
-    doc.setFont("helvetica", "normal");
-    doc.text(`Total income: ${formatCurrency(summary.totalIncome)}`, margin, y);
-    doc.text(
-      `Total expenses: ${formatCurrency(summary.totalExpenses)}`,
-      margin,
-      y + 7,
-    );
-    doc.text(`Balance: ${formatCurrency(summary.balance)}`, margin, y + 14);
+    if (rows.length === 0) {
+      doc.text("No transactions found for this period.", margin + 2, y);
+      y += 10;
+    }
 
-    y += 28;
-    doc.setFont("helvetica", "bold");
-    doc.text("Expenses by amount", margin, y);
-    y += 8;
-    doc.setFont("helvetica", "normal");
-
-    const writeRows = (rows: ReportRow[], emptyText: string) => {
-      if (rows.length === 0) {
-        doc.text(emptyText, margin, y);
-        y += 8;
-        return;
+    rows.forEach((row) => {
+      if (y > 270) {
+        doc.addPage();
+        y = 18;
+        tableTop();
       }
 
-      rows.forEach((row) => {
-        if (y > 275) {
-          doc.addPage();
-          y = 18;
-        }
-        doc.text(`${row.title} (${row.detail})`, margin, y);
-        doc.text(formatCurrency(row.amount), 150, y, { align: "right" });
-        y += 6;
-        doc.setTextColor(100);
-        doc.text(row.date, margin, y);
-        doc.setTextColor(0);
-        y += 8;
-      });
-    };
+      doc.setFontSize(8);
+      doc.setTextColor(15, 23, 42);
+      doc.text(row.date, margin + 2, y);
+      doc.text(row.type, margin + 26, y);
+      doc.text(row.title.slice(0, 34), margin + 50, y);
+      doc.text(row.paymentMode, margin + 112, y);
+      doc.text(formatCurrency(row.signedAmount), 192, y, { align: "right" });
+      y += 4;
+      doc.setTextColor(100, 116, 139);
+      doc.text(row.categoryOrSource.slice(0, 46), margin + 50, y);
+      doc.setTextColor(0, 0, 0);
+      doc.setDrawColor(226, 232, 240);
+      doc.line(margin, y + 3, 194, y + 3);
+      y += 7;
+    });
 
-    writeRows(expenses, "No expenses found.");
-
-    y += 6;
-    doc.setFont("helvetica", "bold");
-    doc.text("Incomes by amount", margin, y);
     y += 8;
-    doc.setFont("helvetica", "normal");
-    writeRows(incomes, "No incomes found.");
+    if (y > 260) {
+      doc.addPage();
+      y = 18;
+    }
+
+    const totals = [
+      ["Total income", summary.totalIncome],
+      ["Total expenses", -summary.totalExpenses],
+      ["Closing balance", summary.balance],
+    ] as const;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    totals.forEach(([label, value]) => {
+      doc.text(label, 130, y);
+      doc.text(formatCurrency(value), 192, y, { align: "right" });
+      y += 7;
+    });
 
     doc.save(`nm-finance-${fileSafePeriod}-report.pdf`);
   }
 
   function downloadExcel() {
-    const rows = [
-      ["Section", "Title", "Detail", "Amount", "Date"],
-      ["Summary", "Total Income", "", summary.totalIncome, ""],
-      ["Summary", "Total Expenses", "", summary.totalExpenses, ""],
-      ["Summary", "Balance", "", summary.balance, ""],
+    const worksheetData = [
+      [
+        "Date",
+        "Type",
+        "Description",
+        "Source or Category",
+        "Payment Mode",
+        "Amount",
+      ],
+      ...rows.map((row) => [
+        row.date,
+        row.type,
+        row.title,
+        row.categoryOrSource,
+        row.paymentMode,
+        row.signedAmount,
+      ]),
       ["", "", "", "", ""],
-      ...expenses.map((expense) => [
-        "Expense",
-        expense.title,
-        expense.detail,
-        expense.amount,
-        expense.date,
-      ]),
-      ...incomes.map((income) => [
-        "Income",
-        income.title,
-        income.detail,
-        income.amount,
-        income.date,
-      ]),
+      ["", "", "", "Total Income", "", summary.totalIncome],
+      ["", "", "", "Total Expenses", "", -summary.totalExpenses],
+      ["", "", "", "Closing Balance", "", summary.balance],
     ];
 
-    const worksheetRows = rows
+    const worksheetRows = worksheetData
       .map((row) => {
         const cells = row
           .map((cell) => {

@@ -1,5 +1,7 @@
+import { Banknote, CreditCard } from "lucide-react";
 import { notFound } from "next/navigation";
 
+import { SubmitButton } from "@/components/submit-button";
 import { requireUserId } from "@/lib/auth-session";
 import { getExpenseById } from "@/lib/expenses";
 
@@ -14,6 +16,21 @@ const categories = [
   "education",
   "health",
   "other",
+];
+
+const paymentModes = [
+  {
+    value: "cash",
+    label: "Cash",
+    description: "Paid with notes or coins",
+    icon: Banknote,
+  },
+  {
+    value: "online",
+    label: "Online",
+    description: "UPI, card, wallet, or bank",
+    icon: CreditCard,
+  },
 ];
 
 type EditExpensePageProps = {
@@ -94,6 +111,36 @@ export default async function EditExpensePage({
           </select>
         </div>
 
+        <fieldset className="space-y-2">
+          <legend className="text-sm font-medium">Payment Mode</legend>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {paymentModes.map((mode) => (
+              <label
+                key={mode.value}
+                className="group relative flex cursor-pointer items-center gap-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-300"
+              >
+                <input
+                  type="radio"
+                  name="paymentMode"
+                  value={mode.value}
+                  defaultChecked={expense.paymentMode === mode.value}
+                  className="peer sr-only"
+                />
+                <span className="grid size-11 place-items-center rounded-full bg-slate-100 text-slate-700 transition peer-checked:bg-slate-950 peer-checked:text-white">
+                  <mode.icon size={20} />
+                </span>
+                <span>
+                  <span className="block font-semibold">{mode.label}</span>
+                  <span className="block text-xs text-slate-500">
+                    {mode.description}
+                  </span>
+                </span>
+                <span className="absolute inset-0 rounded-lg ring-0 ring-emerald-400 transition peer-checked:ring-2" />
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
         <div className="space-y-2">
           <label htmlFor="transactionDate" className="text-sm font-medium">
             Transaction Date
@@ -108,9 +155,12 @@ export default async function EditExpensePage({
           />
         </div>
 
-        <button type="submit" className="button-primary w-full justify-center">
+        <SubmitButton
+          pendingText="Updating expense..."
+          className="button-primary w-full justify-center"
+        >
           Update Expense
-        </button>
+        </SubmitButton>
       </form>
     </section>
   );

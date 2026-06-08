@@ -1,4 +1,4 @@
-import { CalendarDays, FileText, TrendingDown, TrendingUp } from "lucide-react";
+import { CalendarDays, FileText } from "lucide-react";
 import Link from "next/link";
 
 import { requireUserId } from "@/lib/auth-session";
@@ -37,18 +37,35 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
     year: "numeric",
   });
 
-  const expenseRows = report.sortedExpenses.map((expense) => ({
-    title: expense.title,
-    detail: expense.category,
-    amount: Number(expense.amount),
-    date: expense.transactionDate.toLocaleDateString("en-IN"),
-  }));
+  const statementRows = [
+    ...report.sortedExpenses.map((expense) => ({
+      id: expense.id,
+      type: "Expense" as const,
+      title: expense.title,
+      categoryOrSource: expense.category,
+      paymentMode: expense.paymentMode,
+      amount: Number(expense.amount),
+      date: expense.transactionDate,
+    })),
+    ...report.sortedIncomes.map((income) => ({
+      id: income.id,
+      type: "Income" as const,
+      title: income.title,
+      categoryOrSource: income.sourceName,
+      paymentMode: "Account",
+      amount: Number(income.amount),
+      date: income.transactionDate,
+    })),
+  ].sort((a, b) => b.date.getTime() - a.date.getTime());
 
-  const incomeRows = report.sortedIncomes.map((income) => ({
-    title: income.title,
-    detail: income.sourceName,
-    amount: Number(income.amount),
-    date: income.transactionDate.toLocaleDateString("en-IN"),
+  const exportRows = statementRows.map((row) => ({
+    type: row.type,
+    title: row.title,
+    categoryOrSource: row.categoryOrSource,
+    paymentMode: row.paymentMode,
+    amount: row.amount,
+    signedAmount: row.type === "Income" ? row.amount : -row.amount,
+    date: row.date.toLocaleDateString("en-IN"),
   }));
 
   return (
@@ -63,8 +80,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
             Monthly Report
           </h1>
           <p className="mt-1 max-w-xl text-sm text-slate-500">
-            A document-style summary of income, expenses, balance, and largest
-            transactions.
+            A clean table of cash flow activity for the selected period.
           </p>
         </div>
 
@@ -73,6 +89,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
             <Link
               key={link.value}
               href={`/reports?period=${link.value}`}
+              prefetch
               className={`shrink-0 rounded-full px-4 py-2 text-sm transition ${
                 report.period === link.value
                   ? "bg-slate-950 text-white shadow-sm"
@@ -86,7 +103,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
       </div>
 
       <div className="rounded-lg bg-slate-950 p-2 shadow-2xl shadow-slate-300">
-        <article className="rounded-lg bg-[#fffdf7] p-5 text-slate-950 sm:p-8 lg:p-10">
+        <article className="rounded-lg bg-[#fffdf7] p-4 text-slate-950 sm:p-8 lg:p-10">
           <header className="flex flex-col gap-6 border-b border-slate-200 pb-6 md:flex-row md:items-start md:justify-between">
             <div>
               <p className="text-sm font-semibold text-slate-500">
@@ -109,114 +126,117 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
                 totalExpenses: report.totalExpenses,
                 balance: report.balance,
               }}
-              incomes={incomeRows}
-              expenses={expenseRows}
+              rows={exportRows}
             />
           </header>
 
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
-            <div className="rounded-lg bg-emerald-50 p-5">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-semibold text-emerald-800">
-                  Total Income
-                </p>
-                <TrendingUp className="text-emerald-700" size={20} />
-              </div>
-              <p className="mt-4 text-3xl font-semibold text-emerald-800">
-                {formatCurrency(report.totalIncome)}
-              </p>
-            </div>
+          <div className="mt-8 overflow-x-auto rounded-lg border border-slate-300 bg-white">
+            <table className="w-full min-w-[820px] border-collapse text-left text-sm">
+              <thead className="bg-slate-100 text-xs uppercase tracking-wide text-slate-600">
+                <tr>
+                  <th className="border-b border-slate-300 px-4 py-3">Date</th>
+                  <th className="border-b border-slate-300 px-4 py-3">Type</th>
+                  <th className="border-b border-slate-300 px-4 py-3">
+                    Description
+                  </th>
+                  <th className="border-b border-slate-300 px-4 py-3">
+                    Source or Category
+                  </th>
+                  <th className="border-b border-slate-300 px-4 py-3">
+                    Payment
+                  </th>
+                  <th className="border-b border-slate-300 px-4 py-3 text-right">
+                    Amount
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {statementRows.map((row) => (
+                  <tr
+                    key={`${row.type}-${row.id}`}
+                    className="border-b border-slate-200"
+                  >
+                    <td className="px-4 py-3">
+                      {row.date.toLocaleDateString("en-IN")}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-bold ${
+                          row.type === "Income"
+                            ? "bg-emerald-50 text-emerald-700"
+                            : "bg-rose-50 text-rose-700"
+                        }`}
+                      >
+                        {row.type}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 font-semibold">{row.title}</td>
+                    <td className="px-4 py-3 capitalize">
+                      {row.categoryOrSource}
+                    </td>
+                    <td className="px-4 py-3 capitalize">
+                      {row.paymentMode}
+                    </td>
+                    <td
+                      className={`px-4 py-3 text-right font-semibold ${
+                        row.type === "Income"
+                          ? "text-emerald-700"
+                          : "text-rose-700"
+                      }`}
+                    >
+                      {row.type === "Income" ? "+" : "-"}
+                      {formatCurrency(row.amount)}
+                    </td>
+                  </tr>
+                ))}
 
-            <div className="rounded-lg bg-rose-50 p-5">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-semibold text-rose-800">
-                  Total Expenses
-                </p>
-                <TrendingDown className="text-rose-700" size={20} />
-              </div>
-              <p className="mt-4 text-3xl font-semibold text-rose-800">
-                {formatCurrency(report.totalExpenses)}
-              </p>
-            </div>
-
-            <div className="rounded-lg bg-slate-100 p-5">
-              <p className="text-sm font-semibold text-slate-600">Balance</p>
-              <p className="mt-4 text-3xl font-semibold">
-                {formatCurrency(report.balance)}
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-10 grid gap-8 lg:grid-cols-2">
-            <ReportList
-              title="Expenses by amount"
-              empty="No expenses found."
-              rows={expenseRows}
-              tone="expense"
-            />
-            <ReportList
-              title="Incomes by amount"
-              empty="No incomes found."
-              rows={incomeRows}
-              tone="income"
-            />
+                {statementRows.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      className="px-4 py-10 text-center text-slate-500"
+                    >
+                      No transactions found for this period.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+              <tfoot className="bg-[#fbf7eb] font-semibold">
+                <tr>
+                  <td
+                    colSpan={5}
+                    className="border-t border-slate-300 px-4 py-3"
+                  >
+                    Total Income
+                  </td>
+                  <td className="border-t border-slate-300 px-4 py-3 text-right text-emerald-700">
+                    {formatCurrency(report.totalIncome)}
+                  </td>
+                </tr>
+                <tr>
+                  <td colSpan={5} className="px-4 py-3">
+                    Total Expenses
+                  </td>
+                  <td className="px-4 py-3 text-right text-rose-700">
+                    {formatCurrency(report.totalExpenses)}
+                  </td>
+                </tr>
+                <tr>
+                  <td colSpan={5} className="px-4 py-3">
+                    Closing Balance
+                  </td>
+                  <td
+                    className={`px-4 py-3 text-right ${
+                      report.balance >= 0 ? "text-slate-950" : "text-rose-700"
+                    }`}
+                  >
+                    {formatCurrency(report.balance)}
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
           </div>
         </article>
-      </div>
-    </section>
-  );
-}
-
-function ReportList({
-  title,
-  empty,
-  rows,
-  tone,
-}: {
-  title: string;
-  empty: string;
-  rows: {
-    title: string;
-    detail: string;
-    amount: number;
-    date: string;
-  }[];
-  tone: "income" | "expense";
-}) {
-  return (
-    <section className="rounded-lg border border-slate-200 bg-white p-4">
-      <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-        <h3 className="font-semibold">{title}</h3>
-        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">
-          {rows.length} rows
-        </span>
-      </div>
-
-      <div className="divide-y divide-slate-100">
-        {rows.map((row) => (
-          <div
-            key={`${row.title}-${row.date}-${row.amount}`}
-            className="flex items-center justify-between gap-4 py-4 text-sm"
-          >
-            <div>
-              <p className="font-semibold">{row.title}</p>
-              <p className="mt-1 text-slate-500 capitalize">
-                {row.detail} - {row.date}
-              </p>
-            </div>
-            <p
-              className={`font-semibold ${
-                tone === "income" ? "text-emerald-700" : "text-rose-700"
-              }`}
-            >
-              {formatCurrency(row.amount)}
-            </p>
-          </div>
-        ))}
-
-        {rows.length === 0 && (
-          <p className="py-5 text-sm text-slate-500">{empty}</p>
-        )}
       </div>
     </section>
   );

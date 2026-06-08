@@ -1,9 +1,22 @@
+import {
+  ArrowDownLeft,
+  ArrowUpRight,
+  Banknote,
+  CirclePlus,
+  CreditCard,
+  ReceiptText,
+  TrendingDown,
+  TrendingUp,
+  Wallet,
+} from "lucide-react";
 import Link from "next/link";
 
 import { requireUserId } from "@/lib/auth-session";
 import { getDashboardAnalytics } from "@/lib/analytics";
 import { normalizePeriod } from "@/lib/date-filters";
 import { formatCurrency } from "@/lib/format";
+
+import { ThemeToggle } from "./theme-toggle";
 
 type DashboardPageProps = {
   searchParams: Promise<{
@@ -30,16 +43,31 @@ export default async function DashboardPage({
       label: "Total Income",
       value: formatCurrency(analytics.totalIncome),
       tone: "text-emerald-700",
+      icon: TrendingUp,
     },
     {
       label: "Total Expenses",
       value: formatCurrency(analytics.totalExpenses),
       tone: "text-rose-700",
+      icon: TrendingDown,
     },
     {
       label: "Balance",
       value: formatCurrency(analytics.balance),
       tone: analytics.balance >= 0 ? "text-slate-950" : "text-rose-700",
+      icon: Wallet,
+    },
+    {
+      label: "Cash Expenses",
+      value: formatCurrency(analytics.cashExpenses),
+      tone: "text-amber-700",
+      icon: Banknote,
+    },
+    {
+      label: "Online Expenses",
+      value: formatCurrency(analytics.onlineExpenses),
+      tone: "text-sky-700",
+      icon: CreditCard,
     },
     {
       label: "Max Expense",
@@ -49,8 +77,17 @@ export default async function DashboardPage({
           )}`
         : "No expenses",
       tone: "text-slate-950",
+      icon: ReceiptText,
     },
   ];
+
+  const expenseSplit =
+    analytics.totalExpenses > 0
+      ? {
+          cash: (analytics.cashExpenses / analytics.totalExpenses) * 100,
+          online: (analytics.onlineExpenses / analytics.totalExpenses) * 100,
+        }
+      : { cash: 0, online: 0 };
 
   return (
     <section className="animate-in space-y-6">
@@ -67,33 +104,118 @@ export default async function DashboardPage({
             Dashboard
           </h1>
           <p className="mt-1 max-w-xl text-sm text-slate-500">
-            A quick view of your money flow, balance, and spending focus.
+            Fast overview of your balance, payment modes, and latest focus.
           </p>
         </div>
 
-        <div className="flex overflow-x-auto rounded-full border border-slate-200 bg-white p-1 shadow-sm">
-          {periodLinks.map((link) => (
-            <Link
-              key={link.value}
-              href={`/dashboard?period=${link.value}`}
-              className={`shrink-0 rounded-full px-4 py-2 text-sm transition ${
-                analytics.period === link.value
-                  ? "bg-slate-950 text-white shadow-sm"
-                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
-              }`}
-            >
-              {link.label}
-            </Link>
-          ))}
+        <div className="flex items-center gap-3">
+          <div className="flex overflow-x-auto rounded-full border border-slate-200 bg-white p-1 shadow-sm">
+            {periodLinks.map((link) => (
+              <Link
+                key={link.value}
+                href={`/dashboard?period=${link.value}`}
+                prefetch
+                className={`shrink-0 rounded-full px-4 py-2 text-sm transition ${
+                  analytics.period === link.value
+                    ? "bg-slate-950 text-white shadow-sm"
+                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+          <ThemeToggle />
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="overflow-hidden rounded-lg border border-slate-200 bg-slate-950 text-white shadow-2xl shadow-slate-300">
+        <div className="grid gap-0 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="p-5 sm:p-7">
+            <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-bold text-emerald-200">
+              <Wallet size={15} />
+              Money position
+            </p>
+            <h2 className="mt-5 text-4xl font-semibold sm:text-5xl">
+              {formatCurrency(analytics.balance)}
+            </h2>
+            <p className="mt-3 max-w-xl leading-7 text-slate-300">
+              Your selected-period balance after cash and online spending.
+            </p>
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/expenses/create"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-white px-5 text-sm font-bold text-slate-950 shadow-xl shadow-black/20 transition hover:bg-slate-100"
+              >
+                <CirclePlus size={18} />
+                Add Expense
+              </Link>
+              <Link
+                href="/incomes/create"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/10 px-5 text-sm font-bold text-white transition hover:bg-white/15"
+              >
+                <ArrowUpRight size={18} />
+                Add Income
+              </Link>
+            </div>
+          </div>
+
+          <div className="border-t border-white/10 p-5 sm:p-7 lg:border-l lg:border-t-0">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <p className="flex items-center gap-2 text-sm text-slate-300">
+                  <Banknote size={16} />
+                  Cash
+                </p>
+                <p className="mt-2 text-2xl font-semibold text-amber-300">
+                  {formatCurrency(analytics.cashExpenses)}
+                </p>
+              </div>
+              <div>
+                <p className="flex items-center gap-2 text-sm text-slate-300">
+                  <CreditCard size={16} />
+                  Online
+                </p>
+                <p className="mt-2 text-2xl font-semibold text-sky-300">
+                  {formatCurrency(analytics.onlineExpenses)}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 overflow-hidden rounded-full bg-white/10">
+              <div className="flex h-3">
+                <span
+                  className="bg-amber-400"
+                  style={{ width: `${expenseSplit.cash}%` }}
+                />
+                <span
+                  className="bg-sky-400"
+                  style={{ width: `${expenseSplit.online}%` }}
+                />
+              </div>
+            </div>
+            <p className="mt-4 flex items-center gap-2 text-sm text-slate-300">
+              <ArrowDownLeft size={16} />
+              {analytics.totalExpenses > 0
+                ? "Expense split for this period"
+                : "Add expenses to see your payment split"}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {cards.map((card) => (
           <div key={card.label} className="panel p-5">
-            <p className="text-sm text-slate-500">{card.label}</p>
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-sm text-slate-500">{card.label}</p>
+              <span className="grid size-10 place-items-center rounded-full bg-slate-100 text-slate-700">
+                <card.icon size={18} />
+              </span>
+            </div>
             <p
-              className={`mt-2 text-2xl font-semibold ${card.tone}`}
+              className={`mt-3 text-2xl font-semibold ${card.tone}`}
             >
               {card.value}
             </p>

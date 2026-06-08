@@ -79,6 +79,11 @@ export const expenseCategoryEnum = pgEnum("expense_category", [
   "other",
 ]);
 
+export const expensePaymentModeEnum = pgEnum("expense_payment_mode", [
+  "cash",
+  "online",
+]);
+
 export const incomes = pgTable("incomes", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: text("user_id")
@@ -101,6 +106,7 @@ export const expenses = pgTable("expenses", {
   title: varchar("title", { length: 120 }).notNull(),
   amount: numeric("amount", { precision: 12, scale: 2 }).notNull(),
   category: expenseCategoryEnum("category").notNull(),
+  paymentMode: expensePaymentModeEnum("payment_mode").default("cash").notNull(),
   transactionDate: timestamp("transaction_date").defaultNow().notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

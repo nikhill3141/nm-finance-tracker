@@ -1,3 +1,4 @@
+import { Banknote, CreditCard } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -21,6 +22,8 @@ export default async function ExpenseDetailsPage({
   if (!expense) {
     notFound();
   }
+
+  const PaymentIcon = expense.paymentMode === "cash" ? Banknote : CreditCard;
 
   return (
     <section className="animate-in max-w-2xl space-y-6">
@@ -49,6 +52,14 @@ export default async function ExpenseDetailsPage({
             <dt className="text-sm text-slate-500">Transaction Date</dt>
             <dd className="font-medium">
               {expense.transactionDate.toLocaleDateString("en-IN")}
+            </dd>
+          </div>
+
+          <div>
+            <dt className="text-sm text-slate-500">Payment Mode</dt>
+            <dd className="mt-1 inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-sm font-bold capitalize text-slate-700">
+              <PaymentIcon size={16} />
+              {expense.paymentMode}
             </dd>
           </div>
         </dl>

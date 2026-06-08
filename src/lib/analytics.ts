@@ -38,6 +38,14 @@ export async function getDashboardAnalytics(
     0,
   );
 
+  const cashExpenses = filteredExpenses
+    .filter((expense) => expense.paymentMode === "cash")
+    .reduce((sum, expense) => sum + toNumber(expense.amount), 0);
+
+  const onlineExpenses = filteredExpenses
+    .filter((expense) => expense.paymentMode === "online")
+    .reduce((sum, expense) => sum + toNumber(expense.amount), 0);
+
   const balance = totalIncome - totalExpenses;
 
   const maxExpense = filteredExpenses.reduce(
@@ -64,6 +72,8 @@ export async function getDashboardAnalytics(
     period,
     totalIncome,
     totalExpenses,
+    cashExpenses,
+    onlineExpenses,
     balance,
     maxExpense,
     topCategory: topCategory

@@ -3,6 +3,18 @@ import { and, desc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { expenses } from "@/db/schema";
 
+export type ExpensePaymentMode = "cash" | "online";
+
+export type ExpenseCategory =
+  | "food"
+  | "rent"
+  | "travel"
+  | "shopping"
+  | "bills"
+  | "education"
+  | "health"
+  | "other";
+
 export async function getExpenses(userId: string) {
   return db
     .select()
@@ -23,15 +35,8 @@ export async function createExpense(input: {
   userId: string;
   title: string;
   amount: string;
-  category:
-    | "food"
-    | "rent"
-    | "travel"
-    | "shopping"
-    | "bills"
-    | "education"
-    | "health"
-    | "other";
+  category: ExpenseCategory;
+  paymentMode: ExpensePaymentMode;
   transactionDate?: Date;
 }) {
   const [expense] = await db
@@ -41,6 +46,7 @@ export async function createExpense(input: {
       title: input.title,
       amount: input.amount,
       category: input.category,
+      paymentMode: input.paymentMode,
       transactionDate: input.transactionDate ?? new Date(),
     })
     .returning();
@@ -54,15 +60,8 @@ export async function updateExpense(
   input: {
     title: string;
     amount: string;
-    category:
-      | "food"
-      | "rent"
-      | "travel"
-      | "shopping"
-      | "bills"
-      | "education"
-      | "health"
-      | "other";
+    category: ExpenseCategory;
+    paymentMode: ExpensePaymentMode;
     transactionDate?: Date;
   },
 ) {
@@ -72,6 +71,7 @@ export async function updateExpense(
       title: input.title,
       amount: input.amount,
       category: input.category,
+      paymentMode: input.paymentMode,
       transactionDate: input.transactionDate ?? new Date(),
       updatedAt: new Date(),
     })

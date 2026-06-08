@@ -1,3 +1,4 @@
+import { Banknote, CreditCard, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 import { requireUserId } from "@/lib/auth-session";
@@ -5,6 +6,17 @@ import { getExpenses } from "@/lib/expenses";
 import { formatCurrency } from "@/lib/format";
 
 import { deleteExpenseAction } from "./actions";
+
+function PaymentModeBadge({ mode }: { mode: "cash" | "online" }) {
+  const Icon = mode === "cash" ? Banknote : CreditCard;
+
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-bold capitalize text-slate-600">
+      <Icon size={14} />
+      {mode}
+    </span>
+  );
+}
 
 export default async function ExpensesPage() {
   const userId = await requireUserId();
@@ -31,9 +43,12 @@ export default async function ExpensesPage() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="font-semibold">{expense.title}</p>
-                <p className="mt-1 text-sm capitalize text-slate-500">
-                  {expense.category}
-                </p>
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <span className="rounded-full bg-rose-50 px-3 py-1 text-xs font-bold capitalize text-rose-700">
+                    {expense.category}
+                  </span>
+                  <PaymentModeBadge mode={expense.paymentMode} />
+                </div>
               </div>
               <p className="font-semibold text-rose-700">
                 {formatCurrency(expense.amount)}
@@ -54,6 +69,15 @@ export default async function ExpensesPage() {
                 >
                   Edit
                 </Link>
+                <form action={deleteExpenseAction.bind(null, expense.id)}>
+                  <button
+                    type="submit"
+                    className="button-soft text-red-600"
+                    aria-label={`Delete ${expense.title}`}
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </form>
               </div>
             </div>
           </article>
@@ -75,6 +99,7 @@ export default async function ExpensesPage() {
             <tr>
               <th className="px-4 py-3">Title</th>
               <th className="px-4 py-3">Category</th>
+              <th className="px-4 py-3">Payment</th>
               <th className="px-4 py-3">Amount</th>
               <th className="px-4 py-3">Date</th>
               <th className="px-4 py-3 text-right">Actions</th>
@@ -85,6 +110,9 @@ export default async function ExpensesPage() {
               <tr key={expense.id} className="border-t border-slate-100">
                 <td className="px-4 py-3">{expense.title}</td>
                 <td className="px-4 py-3 capitalize">{expense.category}</td>
+                <td className="px-4 py-3">
+                  <PaymentModeBadge mode={expense.paymentMode} />
+                </td>
                 <td className="px-4 py-3 font-medium text-rose-700">
                   {formatCurrency(expense.amount)}
                 </td>
@@ -118,7 +146,7 @@ export default async function ExpensesPage() {
             {expenses.length === 0 && (
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={6}
                   className="px-4 py-8 text-center text-slate-500"
                 >
                   No expenses added yet.

@@ -1,8 +1,6 @@
 import {
   ArrowDownLeft,
-  ArrowUpRight,
   Banknote,
-  CirclePlus,
   CreditCard,
   ReceiptText,
   TrendingDown,
@@ -114,7 +112,9 @@ export default async function DashboardPage({
               </Link>
             ))}
           </div>
-          <ThemeToggle className=" hidden md:inline-flex" />
+          <div className="hidden md:block">
+            <ThemeToggle />
+          </div>
         </div>
       </div>
 

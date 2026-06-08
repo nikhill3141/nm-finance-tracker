@@ -18,47 +18,57 @@ function getRequiredString(formData: FormData, key: string) {
 
 export async function createIncomeAction(formData: FormData) {
   const userId = await requireUserId();
-  const title = getRequiredString(formData, "title");
-  const sourceName = getRequiredString(formData, "sourceName");
-  const amount = getRequiredString(formData, "amount");
-  const incomeType = getRequiredString(formData, "incomeType") as
-    | "fixed"
-    | "variable";
-  const transactionDate = getRequiredString(formData, "transactionDate");
 
-  await createIncome({
-    userId,
-    title,
-    sourceName,
-    amount,
-    incomeType,
-    transactionDate: new Date(transactionDate),
-  });
+  try {
+    const title = getRequiredString(formData, "title");
+    const sourceName = getRequiredString(formData, "sourceName");
+    const amount = getRequiredString(formData, "amount");
+    const incomeType = getRequiredString(formData, "incomeType") as
+      | "fixed"
+      | "variable";
+    const transactionDate = getRequiredString(formData, "transactionDate");
+
+    await createIncome({
+      userId,
+      title,
+      sourceName,
+      amount,
+      incomeType,
+      transactionDate: new Date(transactionDate),
+    });
+  } catch {
+    redirect("/incomes/create?toast=income-save-failed");
+  }
 
   revalidatePath("/incomes");
   revalidatePath("/dashboard");
   revalidatePath("/reports");
 
-  redirect("/incomes");
+  redirect("/incomes?toast=income-created");
 }
 
 export async function updateIncomeAction(id: string, formData: FormData) {
   const userId = await requireUserId();
-  const title = getRequiredString(formData, "title");
-  const sourceName = getRequiredString(formData, "sourceName");
-  const amount = getRequiredString(formData, "amount");
-  const incomeType = getRequiredString(formData, "incomeType") as
-    | "fixed"
-    | "variable";
-  const transactionDate = getRequiredString(formData, "transactionDate");
 
-  await updateIncome(id, userId, {
-    title,
-    sourceName,
-    amount,
-    incomeType,
-    transactionDate: new Date(transactionDate),
-  });
+  try {
+    const title = getRequiredString(formData, "title");
+    const sourceName = getRequiredString(formData, "sourceName");
+    const amount = getRequiredString(formData, "amount");
+    const incomeType = getRequiredString(formData, "incomeType") as
+      | "fixed"
+      | "variable";
+    const transactionDate = getRequiredString(formData, "transactionDate");
+
+    await updateIncome(id, userId, {
+      title,
+      sourceName,
+      amount,
+      incomeType,
+      transactionDate: new Date(transactionDate),
+    });
+  } catch {
+    redirect(`/incomes/${id}/edit?toast=income-save-failed`);
+  }
 
   revalidatePath("/incomes");
   revalidatePath("/incomes/[id]", "page");
@@ -66,16 +76,21 @@ export async function updateIncomeAction(id: string, formData: FormData) {
   revalidatePath("/dashboard");
   revalidatePath("/reports");
 
-  redirect("/incomes");
-
+  redirect("/incomes?toast=income-updated");
 }
 
 export async function deleteIncomeAction(id: string) {
   const userId = await requireUserId();
 
-  await deleteIncome(id, userId);
+  try {
+    await deleteIncome(id, userId);
+  } catch {
+    redirect("/incomes?toast=income-delete-failed");
+  }
 
   revalidatePath("/incomes");
   revalidatePath("/dashboard");
   revalidatePath("/reports");
+
+  redirect("/incomes?toast=income-deleted");
 }

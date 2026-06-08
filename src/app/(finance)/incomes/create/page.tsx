@@ -1,3 +1,5 @@
+import { ToastForm } from "@/components/toast-form";
+
 import { createIncomeAction } from "../actions";
 
 export default function CreateIncomePage() {
@@ -10,7 +12,7 @@ export default function CreateIncomePage() {
         </p>
       </div>
 
-      <form action={createIncomeAction} className="panel space-y-4 p-5">
+      <ToastForm action={createIncomeAction} className="panel space-y-4 p-5">
         <div className="space-y-2">
           <label htmlFor="title" className="text-sm font-medium">
             Title
@@ -80,7 +82,7 @@ export default function CreateIncomePage() {
         <button type="submit" className="button-primary w-full justify-center">
           Save Income
         </button>
-      </form>
+      </ToastForm>
     </section>
   );
 }

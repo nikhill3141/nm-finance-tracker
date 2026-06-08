@@ -2,6 +2,7 @@ import { Banknote, CreditCard } from "lucide-react";
 import { notFound } from "next/navigation";
 
 import { SubmitButton } from "@/components/submit-button";
+import { ToastForm } from "@/components/toast-form";
 import { requireUserId } from "@/lib/auth-session";
 import { getExpenseById } from "@/lib/expenses";
 
@@ -59,7 +60,7 @@ export default async function EditExpensePage({
         </p>
       </div>
 
-      <form
+      <ToastForm
         action={updateExpenseAction.bind(null, expense.id)}
         className="panel space-y-4 p-5"
       >
@@ -161,7 +162,7 @@ export default async function EditExpensePage({
         >
           Update Expense
         </SubmitButton>
-      </form>
+      </ToastForm>
     </section>
   );
 }

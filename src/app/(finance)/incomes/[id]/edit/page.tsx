@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { ToastForm } from "@/components/toast-form";
 import { requireUserId } from "@/lib/auth-session";
 import { getIncomeById } from "@/lib/incomes";
 
@@ -29,7 +30,7 @@ export default async function EditIncomePage({ params }: EditIncomePageProps) {
         </p>
       </div>
 
-      <form
+      <ToastForm
         action={updateIncomeAction.bind(null, income.id)}
         className="panel space-y-4 p-5"
       >
@@ -108,7 +109,7 @@ export default async function EditIncomePage({ params }: EditIncomePageProps) {
         <button type="submit" className="button-primary w-full justify-center">
           Update Income
         </button>
-      </form>
+      </ToastForm>
     </section>
   );
 }

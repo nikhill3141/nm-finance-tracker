@@ -12,10 +12,19 @@ type SignInPageProps = {
   }>;
 };
 
+function withToast(url: string, toast: string) {
+  if (!url.startsWith("/")) {
+    return `/dashboard?toast=${toast}`;
+  }
+
+  return `${url}${url.includes("?") ? "&" : "?"}toast=${toast}`;
+}
+
 export default async function SignInPage({ searchParams }: SignInPageProps) {
   const session = await auth();
   const params = await searchParams;
   const callbackUrl = params.callbackUrl ?? "/dashboard";
+  const redirectTo = withToast(callbackUrl, "signed-in");
 
   if (session?.user) {
     redirect("/dashboard");
@@ -61,10 +70,10 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
             action={async () => {
               "use server";
               try {
-                await signIn("google", { redirectTo: callbackUrl });
+                await signIn("google", { redirectTo });
               } catch (error) {
                 if (error instanceof AuthError) {
-                  redirect("/sign-in?error=auth");
+                  redirect("/sign-in?error=auth&toast=sign-in-failed");
                 }
 
                 throw error;

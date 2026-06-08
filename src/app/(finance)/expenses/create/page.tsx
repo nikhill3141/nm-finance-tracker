@@ -1,6 +1,7 @@
 import { Banknote, CreditCard } from "lucide-react";
 
 import { SubmitButton } from "@/components/submit-button";
+import { ToastForm } from "@/components/toast-form";
 
 import { createExpenseAction } from "../actions";
 
@@ -40,7 +41,7 @@ export default function CreateExpensePage() {
         </p>
       </div>
 
-      <form action={createExpenseAction} className="panel space-y-4 p-5">
+      <ToastForm action={createExpenseAction} className="panel space-y-4 p-5">
         <div className="space-y-2">
           <label htmlFor="title" className="text-sm font-medium">
             Title
@@ -133,7 +134,7 @@ export default function CreateExpensePage() {
         >
           Save Expense
         </SubmitButton>
-      </form>
+      </ToastForm>
     </section>
   );
 }

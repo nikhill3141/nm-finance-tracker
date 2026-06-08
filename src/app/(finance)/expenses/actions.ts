@@ -63,43 +63,53 @@ function getPaymentMode(formData: FormData) {
 
 export async function createExpenseAction(formData: FormData) {
   const userId = await requireUserId();
-  const title = getRequiredString(formData, "title");
-  const amount = getRequiredString(formData, "amount");
-  const category = getExpenseCategory(formData);
-  const paymentMode = getPaymentMode(formData);
-  const transactionDate = getRequiredString(formData, "transactionDate");
 
-  await createExpense({
-    userId,
-    title,
-    amount,
-    category,
-    paymentMode,
-    transactionDate: new Date(transactionDate),
-  });
+  try {
+    const title = getRequiredString(formData, "title");
+    const amount = getRequiredString(formData, "amount");
+    const category = getExpenseCategory(formData);
+    const paymentMode = getPaymentMode(formData);
+    const transactionDate = getRequiredString(formData, "transactionDate");
+
+    await createExpense({
+      userId,
+      title,
+      amount,
+      category,
+      paymentMode,
+      transactionDate: new Date(transactionDate),
+    });
+  } catch {
+    redirect("/expenses/create?toast=expense-save-failed");
+  }
 
   revalidatePath("/expenses");
   revalidatePath("/dashboard");
   revalidatePath("/reports");
 
-  redirect("/expenses");
+  redirect("/expenses?toast=expense-created");
 }
 
 export async function updateExpenseAction(id: string, formData: FormData) {
   const userId = await requireUserId();
-  const title = getRequiredString(formData, "title");
-  const amount = getRequiredString(formData, "amount");
-  const category = getExpenseCategory(formData);
-  const paymentMode = getPaymentMode(formData);
-  const transactionDate = getRequiredString(formData, "transactionDate");
 
-  await updateExpense(id, userId, {
-    title,
-    amount,
-    category,
-    paymentMode,
-    transactionDate: new Date(transactionDate),
-  });
+  try {
+    const title = getRequiredString(formData, "title");
+    const amount = getRequiredString(formData, "amount");
+    const category = getExpenseCategory(formData);
+    const paymentMode = getPaymentMode(formData);
+    const transactionDate = getRequiredString(formData, "transactionDate");
+
+    await updateExpense(id, userId, {
+      title,
+      amount,
+      category,
+      paymentMode,
+      transactionDate: new Date(transactionDate),
+    });
+  } catch {
+    redirect(`/expenses/${id}/edit?toast=expense-save-failed`);
+  }
 
   revalidatePath("/expenses");
   revalidatePath("/expenses/[id]", "page");
@@ -107,15 +117,21 @@ export async function updateExpenseAction(id: string, formData: FormData) {
   revalidatePath("/dashboard");
   revalidatePath("/reports");
 
-  redirect("/expenses");
+  redirect("/expenses?toast=expense-updated");
 }
 
 export async function deleteExpenseAction(id: string) {
   const userId = await requireUserId();
 
-  await deleteExpense(id, userId);
+  try {
+    await deleteExpense(id, userId);
+  } catch {
+    redirect("/expenses?toast=expense-delete-failed");
+  }
 
   revalidatePath("/expenses");
   revalidatePath("/dashboard");
   revalidatePath("/reports");
+
+  redirect("/expenses?toast=expense-deleted");
 }

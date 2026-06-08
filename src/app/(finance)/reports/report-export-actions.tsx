@@ -90,7 +90,7 @@ export function ReportExportActions({
       doc.text("Title", margin + 58, y + 7);
       doc.text("Payment", margin + 122, y + 7);
       doc.text("Amount", pageWidth - margin - 3, y + 7, { align: "right" });
-      y += 12;
+      y += 15;
       doc.setFont("helvetica", "normal");
       doc.setTextColor(15, 23, 42);
     };
@@ -159,13 +159,17 @@ export function ReportExportActions({
       doc.text(row.type, margin + 31, y);
       doc.text(cleanPdfText(row.title, 34), margin + 58, y);
       doc.text(cleanPdfText(row.paymentMode, 16), margin + 122, y);
-      doc.setTextColor(row.signedAmount >= 0 ? 22 : 220, row.signedAmount >= 0 ? 163 : 38, row.signedAmount >= 0 ? 74 : 38);
+      doc.setTextColor(
+        row.signedAmount >= 0 ? 22 : 220,
+        row.signedAmount >= 0 ? 163 : 38,
+        row.signedAmount >= 0 ? 74 : 38,
+      );
       doc.text(formatPdfCurrency(row.signedAmount), pageWidth - margin - 3, y, {
         align: "right",
       });
       doc.setDrawColor(226, 232, 240);
-      doc.line(margin, y + 4, pageWidth - margin, y + 4);
-      y += 9;
+      doc.line(margin, y + 5, pageWidth - margin, y + 5);
+      y += 10;
     });
 
     doc.save(`nm-finance-${fileSafePeriod}-report.pdf`);
@@ -239,6 +243,7 @@ export function ReportExportActions({
       >
         <FileText className="mr-2" size={17} />
         PDF
+        <Download className="ml-2" size={15} />
       </button>
       <button
         type="button"
@@ -247,6 +252,7 @@ export function ReportExportActions({
       >
         <FileSpreadsheet className="mr-2" size={17} />
         Excel
+        <Download className="ml-2" size={15} />
       </button>
       <span className="hidden items-center text-xs text-slate-500 lg:inline-flex">
         <Download className="mr-1" size={14} />

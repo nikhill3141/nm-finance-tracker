@@ -77,7 +77,7 @@ export default async function FinanceLayout({
             className="mt-4"
             action={async () => {
               "use server";
-              await signOut({ redirectTo: "/sign-in" });
+              await signOut({ redirectTo: "/sign-in?toast=signed-out" });
             }}
           >
             <button type="submit" className="button-soft w-full justify-center">

@@ -94,9 +94,7 @@ export default async function DashboardPage({
               year: "numeric",
             })}
           </p>
-          <h1 className="mt-1 text-3xl font-semibold">
-            Dashboard
-          </h1>
+          <h1 className="mt-1 text-3xl font-semibold">Dashboard</h1>
         </div>
 
         <div className="flex items-center gap-3">
@@ -116,7 +114,7 @@ export default async function DashboardPage({
               </Link>
             ))}
           </div>
-          <ThemeToggle className="hidden md:inline-flex" />
+          <ThemeToggle className=" hidden md:inline-flex" />
         </div>
       </div>
 
@@ -125,31 +123,12 @@ export default async function DashboardPage({
           <div className="p-5 sm:p-7">
             <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-bold text-emerald-200">
               <Wallet size={15} />
-              Money position
+              Available balance
             </p>
             <h2 className="mt-5 text-4xl font-semibold sm:text-5xl">
               {formatCurrency(analytics.balance)}
             </h2>
-            <p className="mt-3 max-w-xl leading-7 text-slate-300">
-              Your selected-period balance after cash and online spending.
-            </p>
 
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/expenses/create"
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-white px-5 text-sm font-bold text-slate-950 shadow-xl shadow-black/20 transition hover:bg-slate-100"
-              >
-                <CirclePlus size={18} />
-                Add Expense
-              </Link>
-              <Link
-                href="/incomes/create"
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/10 px-5 text-sm font-bold text-white transition hover:bg-white/15"
-              >
-                <ArrowUpRight size={18} />
-                Add Income
-              </Link>
-            </div>
           </div>
 
           <div className="border-t border-white/10 p-5 sm:p-7 lg:border-l lg:border-t-0">
@@ -210,9 +189,7 @@ export default async function DashboardPage({
                 <card.icon size={18} />
               </span>
             </div>
-            <p
-              className={`mt-3 text-2xl font-semibold ${card.tone}`}
-            >
+            <p className={`mt-3 text-2xl font-semibold ${card.tone}`}>
               {card.value}
             </p>
           </div>

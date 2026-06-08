@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { requireUserId } from "@/lib/auth-session";
+import { parseTransactionDateInput } from "@/lib/date-filters";
 import { createExpense, deleteExpense, updateExpense } from "@/lib/expenses";
 
 type ExpenseCategory =
@@ -77,7 +78,7 @@ export async function createExpenseAction(formData: FormData) {
       amount,
       category,
       paymentMode,
-      transactionDate: new Date(transactionDate),
+      transactionDate: parseTransactionDateInput(transactionDate),
     });
   } catch {
     redirect("/expenses/create?toast=expense-save-failed");
@@ -105,7 +106,7 @@ export async function updateExpenseAction(id: string, formData: FormData) {
       amount,
       category,
       paymentMode,
-      transactionDate: new Date(transactionDate),
+      transactionDate: parseTransactionDateInput(transactionDate),
     });
   } catch {
     redirect(`/expenses/${id}/edit?toast=expense-save-failed`);

@@ -16,6 +16,8 @@ import { formatCurrency } from "@/lib/format";
 
 import { ThemeToggle } from "./theme-toggle";
 
+export const dynamic = "force-dynamic";
+
 type DashboardPageProps = {
   searchParams: Promise<{
     period?: string;
@@ -101,7 +103,7 @@ export default async function DashboardPage({
               <Link
                 key={link.value}
                 href={`/dashboard?period=${link.value}`}
-                prefetch
+                prefetch={false}
                 className={`shrink-0 rounded-full px-4 py-2 text-sm transition ${
                   analytics.period === link.value
                     ? "bg-slate-950 text-white shadow-sm"

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 
 import { ToastForm } from "@/components/toast-form";
 import { requireUserId } from "@/lib/auth-session";
+import { formatTransactionDateInput } from "@/lib/date-filters";
 import { getIncomeById } from "@/lib/incomes";
 
 import { updateIncomeAction } from "../../actions";
@@ -101,7 +102,7 @@ export default async function EditIncomePage({ params }: EditIncomePageProps) {
             name="transactionDate"
             type="date"
             required
-            defaultValue={income.transactionDate.toISOString().slice(0, 10)}
+            defaultValue={formatTransactionDateInput(income.transactionDate)}
             className="field"
           />
         </div>

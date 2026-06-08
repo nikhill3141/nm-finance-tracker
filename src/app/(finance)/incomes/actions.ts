@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { requireUserId } from "@/lib/auth-session";
+import { parseTransactionDateInput } from "@/lib/date-filters";
 import { createIncome, deleteIncome, updateIncome } from "@/lib/incomes";
 
 function getRequiredString(formData: FormData, key: string) {
@@ -34,7 +35,7 @@ export async function createIncomeAction(formData: FormData) {
       sourceName,
       amount,
       incomeType,
-      transactionDate: new Date(transactionDate),
+      transactionDate: parseTransactionDateInput(transactionDate),
     });
   } catch {
     redirect("/incomes/create?toast=income-save-failed");
@@ -64,7 +65,7 @@ export async function updateIncomeAction(id: string, formData: FormData) {
       sourceName,
       amount,
       incomeType,
-      transactionDate: new Date(transactionDate),
+      transactionDate: parseTransactionDateInput(transactionDate),
     });
   } catch {
     redirect(`/incomes/${id}/edit?toast=income-save-failed`);

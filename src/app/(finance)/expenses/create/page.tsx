@@ -2,6 +2,7 @@ import { Banknote, CreditCard } from "lucide-react";
 
 import { SubmitButton } from "@/components/submit-button";
 import { ToastForm } from "@/components/toast-form";
+import { formatTransactionDateInput } from "@/lib/date-filters";
 
 import { createExpenseAction } from "../actions";
 
@@ -123,7 +124,7 @@ export default function CreateExpensePage() {
             name="transactionDate"
             type="date"
             required
-            defaultValue={new Date().toISOString().slice(0, 10)}
+            defaultValue={formatTransactionDateInput(new Date())}
             className="field"
           />
         </div>

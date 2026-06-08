@@ -46,7 +46,12 @@ export default async function FinanceLayout({
 
         <nav className="mt-8 flex flex-col gap-2">
           {navItems.map((item) => (
-            <Link key={item.href} href={item.href} prefetch className="nav-link">
+            <Link
+              key={item.href}
+              href={item.href}
+              prefetch={false}
+              className="nav-link"
+            >
               {item.label}
             </Link>
           ))}
@@ -124,7 +129,7 @@ export default async function FinanceLayout({
             <Link
               key={item.href}
               href={item.href}
-              prefetch
+              prefetch={false}
               className="mobile-nav-link"
             >
               {item.shortLabel}
@@ -132,7 +137,7 @@ export default async function FinanceLayout({
           ))}
           <Link
             href="/expenses/create"
-            prefetch
+            prefetch={false}
             className="grid min-h-12 place-items-center rounded-full bg-slate-950 px-3 text-sm font-semibold text-white shadow-lg shadow-slate-300 active:scale-95"
           >
             Add
@@ -141,7 +146,7 @@ export default async function FinanceLayout({
             <Link
               key={item.href}
               href={item.href}
-              prefetch
+              prefetch={false}
               className="mobile-nav-link"
             >
               {item.shortLabel}

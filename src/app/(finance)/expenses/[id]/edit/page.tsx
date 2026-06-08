@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { SubmitButton } from "@/components/submit-button";
 import { ToastForm } from "@/components/toast-form";
 import { requireUserId } from "@/lib/auth-session";
+import { formatTransactionDateInput } from "@/lib/date-filters";
 import { getExpenseById } from "@/lib/expenses";
 
 import { updateExpenseAction } from "../../actions";
@@ -151,7 +152,7 @@ export default async function EditExpensePage({
             name="transactionDate"
             type="date"
             required
-            defaultValue={expense.transactionDate.toISOString().slice(0, 10)}
+            defaultValue={formatTransactionDateInput(expense.transactionDate)}
             className="field"
           />
         </div>

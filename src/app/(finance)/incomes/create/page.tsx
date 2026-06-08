@@ -1,4 +1,5 @@
 import { ToastForm } from "@/components/toast-form";
+import { formatTransactionDateInput } from "@/lib/date-filters";
 
 import { createIncomeAction } from "../actions";
 
@@ -74,7 +75,7 @@ export default function CreateIncomePage() {
             name="transactionDate"
             type="date"
             required
-            defaultValue={new Date().toISOString().slice(0, 10)}
+            defaultValue={formatTransactionDateInput(new Date())}
             className="field"
           />
         </div>

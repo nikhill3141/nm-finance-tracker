@@ -296,7 +296,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
                   </tr>
                 )}
               </tbody>
-              <tfoot className="bg-[#fbf7eb] font-semibold">
+              <tfoot className="bg-[#efefef] font-semibold">
                 <tr>
                   <td
                     colSpan={5}

@@ -24,7 +24,12 @@ function getServerSnapshot() {
   return false;
 }
 
-export function ThemeToggle() {
+type ThemeToggleProps = {
+  className?: string;
+  compact?: boolean;
+};
+
+export function ThemeToggle({ className = "", compact = false }: ThemeToggleProps) {
   const isDark = useSyncExternalStore(
     subscribe,
     getSnapshot,
@@ -43,13 +48,21 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={toggleTheme}
-      className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-3 text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50"
+      className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-slate-200 bg-white text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 ${
+        compact ? "w-11 px-0" : "px-3"
+      } ${className}`}
       aria-label="Toggle dark mode"
     >
-      <span className="grid size-8 place-items-center rounded-full bg-slate-950 text-white">
+      <span
+        className={`grid place-items-center rounded-full bg-slate-950 text-white ${
+          compact ? "size-7" : "size-8"
+        }`}
+      >
         {isDark ? <Moon size={16} /> : <Sun size={16} />}
       </span>
-      <span className="hidden sm:inline">{isDark ? "Dark" : "Light"}</span>
+      {compact ? null : (
+        <span className="hidden sm:inline">{isDark ? "Dark" : "Light"}</span>
+      )}
     </button>
   );
 }

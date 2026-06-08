@@ -52,12 +52,6 @@ export default async function DashboardPage({
       icon: TrendingDown,
     },
     {
-      label: "Balance",
-      value: formatCurrency(analytics.balance),
-      tone: analytics.balance >= 0 ? "text-slate-950" : "text-rose-700",
-      icon: Wallet,
-    },
-    {
       label: "Cash Expenses",
       value: formatCurrency(analytics.cashExpenses),
       tone: "text-amber-700",
@@ -103,9 +97,6 @@ export default async function DashboardPage({
           <h1 className="mt-1 text-3xl font-semibold">
             Dashboard
           </h1>
-          <p className="mt-1 max-w-xl text-sm text-slate-500">
-            Fast overview of your balance, payment modes, and latest focus.
-          </p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -125,7 +116,7 @@ export default async function DashboardPage({
               </Link>
             ))}
           </div>
-          <ThemeToggle />
+          <ThemeToggle className="hidden md:inline-flex" />
         </div>
       </div>
 
@@ -205,9 +196,14 @@ export default async function DashboardPage({
         </div>
       </section>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {cards.map((card) => (
-          <div key={card.label} className="panel p-5">
+          <div
+            key={card.label}
+            className={`panel p-5 ${
+              card.label === "Max Expense" ? "sm:col-span-2 xl:col-span-2" : ""
+            }`}
+          >
             <div className="flex items-center justify-between gap-4">
               <p className="text-sm text-slate-500">{card.label}</p>
               <span className="grid size-10 place-items-center rounded-full bg-slate-100 text-slate-700">

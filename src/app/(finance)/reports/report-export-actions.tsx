@@ -24,12 +24,22 @@ type ReportExportActionsProps = {
   rows: ReportRow[];
 };
 
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
+function formatPdfCurrency(value: number) {
+  const sign = value < 0 ? "-" : "";
+  const amount = Math.abs(value).toLocaleString("en-IN", {
+    minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(value);
+  });
+
+  return `${sign}Rs ${amount}`;
+}
+
+function cleanPdfText(value: string, maxLength: number) {
+  return value
+    .replace(/[^\x20-\x7E]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, maxLength);
 }
 
 function saveBlob(blob: Blob, fileName: string) {
@@ -62,82 +72,100 @@ export function ReportExportActions({
   function downloadPdf() {
     const doc = new jsPDF();
     const margin = 16;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const contentWidth = pageWidth - margin * 2;
     let y = 18;
 
-    const tableTop = () => {
-      doc.setFillColor(248, 250, 252);
-      doc.rect(margin, y, 178, 9, "F");
+    const drawTableHeader = () => {
+      doc.setFillColor(241, 245, 249);
+      doc.rect(margin, y, contentWidth, 10, "F");
       doc.setDrawColor(203, 213, 225);
-      doc.line(margin, y + 9, 194, y + 9);
+      doc.line(margin, y + 10, pageWidth - margin, y + 10);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(8);
-      doc.text("Date", margin + 2, y + 6);
-      doc.text("Type", margin + 26, y + 6);
-      doc.text("Description", margin + 50, y + 6);
-      doc.text("Mode", margin + 112, y + 6);
-      doc.text("Amount", 192, y + 6, { align: "right" });
-      y += 11;
+      doc.setTextColor(51, 65, 85);
+      doc.text("Date", margin + 3, y + 7);
+      doc.text("Type", margin + 31, y + 7);
+      doc.text("Title", margin + 58, y + 7);
+      doc.text("Payment", margin + 122, y + 7);
+      doc.text("Amount", pageWidth - margin - 3, y + 7, { align: "right" });
+      y += 12;
       doc.setFont("helvetica", "normal");
+      doc.setTextColor(15, 23, 42);
     };
 
+    const ensureSpace = (height: number) => {
+      if (y + height <= pageHeight - 18) {
+        return;
+      }
+
+      doc.addPage();
+      y = 18;
+      drawTableHeader();
+    };
+
+    doc.setFillColor(15, 23, 42);
+    doc.rect(0, 0, pageWidth, 40, "F");
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(18);
+    doc.setFontSize(16);
+    doc.setTextColor(255, 255, 255);
     doc.text("NM Finance Tracker", margin, y);
-    y += 9;
+    y += 8;
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
+    doc.setTextColor(203, 213, 225);
     doc.text(`${periodLabel} cash flow statement`, margin, y);
     doc.text(`Generated: ${generatedAt}`, margin, y + 6);
 
-    y += 20;
-    tableTop();
+    y = 52;
+    const summaryItems = [
+      ["Total Income", formatPdfCurrency(summary.totalIncome)],
+      ["Total Expenses", formatPdfCurrency(-summary.totalExpenses)],
+      ["Closing Balance", formatPdfCurrency(summary.balance)],
+    ] as const;
+
+    const summaryWidth = (contentWidth - 8) / 3;
+    summaryItems.forEach(([label, value], index) => {
+      const x = margin + index * (summaryWidth + 4);
+      doc.setFillColor(248, 250, 252);
+      doc.setDrawColor(226, 232, 240);
+      doc.rect(x, y, summaryWidth, 25, "FD");
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(100, 116, 139);
+      doc.text(label, x + 4, y + 8);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10);
+      doc.setTextColor(15, 23, 42);
+      doc.text(value, x + 4, y + 18);
+    });
+
+    y += 36;
+    drawTableHeader();
 
     if (rows.length === 0) {
-      doc.text("No transactions found for this period.", margin + 2, y);
+      doc.setFontSize(9);
+      doc.text("No transactions found for this period.", margin + 3, y);
       y += 10;
     }
 
     rows.forEach((row) => {
-      if (y > 270) {
-        doc.addPage();
-        y = 18;
-        tableTop();
-      }
+      ensureSpace(12);
 
       doc.setFontSize(8);
       doc.setTextColor(15, 23, 42);
-      doc.text(row.date, margin + 2, y);
-      doc.text(row.type, margin + 26, y);
-      doc.text(row.title.slice(0, 34), margin + 50, y);
-      doc.text(row.paymentMode, margin + 112, y);
-      doc.text(formatCurrency(row.signedAmount), 192, y, { align: "right" });
-      y += 4;
-      doc.setTextColor(100, 116, 139);
-      doc.text(row.categoryOrSource.slice(0, 46), margin + 50, y);
-      doc.setTextColor(0, 0, 0);
+      doc.text(cleanPdfText(row.date, 18), margin + 3, y);
+      doc.text(row.type, margin + 31, y);
+      doc.text(cleanPdfText(row.title, 34), margin + 58, y);
+      doc.text(cleanPdfText(row.paymentMode, 16), margin + 122, y);
+      doc.setTextColor(row.signedAmount >= 0 ? 22 : 220, row.signedAmount >= 0 ? 163 : 38, row.signedAmount >= 0 ? 74 : 38);
+      doc.text(formatPdfCurrency(row.signedAmount), pageWidth - margin - 3, y, {
+        align: "right",
+      });
       doc.setDrawColor(226, 232, 240);
-      doc.line(margin, y + 3, 194, y + 3);
-      y += 7;
-    });
-
-    y += 8;
-    if (y > 260) {
-      doc.addPage();
-      y = 18;
-    }
-
-    const totals = [
-      ["Total income", summary.totalIncome],
-      ["Total expenses", -summary.totalExpenses],
-      ["Closing balance", summary.balance],
-    ] as const;
-
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    totals.forEach(([label, value]) => {
-      doc.text(label, 130, y);
-      doc.text(formatCurrency(value), 192, y, { align: "right" });
-      y += 7;
+      doc.line(margin, y + 4, pageWidth - margin, y + 4);
+      y += 9;
     });
 
     doc.save(`nm-finance-${fileSafePeriod}-report.pdf`);

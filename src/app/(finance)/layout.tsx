@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { auth, signOut } from "@/auth";
+import { ThemeToggle } from "./dashboard/theme-toggle";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", shortLabel: "Home" },
@@ -94,6 +95,7 @@ export default async function FinanceLayout({
             </Link>
 
             <div className="flex items-center gap-2">
+              <ThemeToggle compact />
               {user.image ? (
                 <Image
                   src={user.image}

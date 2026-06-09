@@ -23,7 +23,7 @@ export function LandingNavbar({ primaryHref, isSignedIn }: LandingNavbarProps) {
             <WalletCards size={19} />
           </span>
           <span className="truncate text-base text-slate-950 dark:text-white">
-            NM Finance
+            NM Finance Tracker
           </span>
         </Link>
 

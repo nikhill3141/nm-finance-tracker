@@ -16,6 +16,10 @@ type ReportRow = {
 type ReportExportActionsProps = {
   periodLabel: string;
   generatedAt: string;
+  user: {
+    name: string;
+    email: string;
+  };
   summary: {
     totalIncome: number;
     totalExpenses: number;
@@ -25,13 +29,12 @@ type ReportExportActionsProps = {
 };
 
 function formatPdfCurrency(value: number) {
-  const sign = value < 0 ? "-" : "";
   const amount = Math.abs(value).toLocaleString("en-IN", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
 
-  return `${sign}Rs ${amount}`;
+  return `Rs ${amount}`;
 }
 
 function cleanPdfText(value: string, maxLength: number) {
@@ -64,6 +67,7 @@ function escapeXml(value: string) {
 export function ReportExportActions({
   periodLabel,
   generatedAt,
+  user,
   summary,
   rows,
 }: ReportExportActionsProps) {
@@ -105,28 +109,61 @@ export function ReportExportActions({
       drawTableHeader();
     };
 
-    doc.setFillColor(15, 23, 42);
-    doc.rect(0, 0, pageWidth, 40, "F");
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(16);
-    doc.setTextColor(255, 255, 255);
-    doc.text("NM Finance Tracker", margin, y);
-    y += 8;
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    doc.setTextColor(203, 213, 225);
-    doc.text(`${periodLabel} cash flow statement`, margin, y);
-    doc.text(`Generated: ${generatedAt}`, margin, y + 6);
+    doc.setFillColor(248, 250, 252);
+    doc.rect(0, 0, pageWidth, 48, "F");
+    doc.setDrawColor(226, 232, 240);
+    doc.line(0, 48, pageWidth, 48);
 
-    y = 52;
+    doc.setFillColor(15, 23, 42);
+    doc.rect(pageWidth - margin - 42, 12, 42, 13, "F");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(255, 255, 255);
+    doc.text("NM Finance", pageWidth - margin - 21, 20, { align: "center" });
+
+    doc.setFontSize(17);
+    doc.setTextColor(15, 23, 42);
+    doc.text("Financial Report", margin, y);
+    y += 7;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8.5);
+    doc.setTextColor(100, 116, 139);
+    doc.text(`${periodLabel} cash flow statement`, margin, y);
+    doc.text(`Generated: ${generatedAt}`, pageWidth - margin, 32, {
+      align: "right",
+    });
+
+    y += 9;
+    doc.setTextColor(100, 116, 139);
+    doc.text("Prepared for", margin, y);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(15, 23, 42);
+    doc.text(cleanPdfText(user.name, 34), margin + 25, y);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(100, 116, 139);
+    doc.text(cleanPdfText(user.email, 42), margin + 25, y + 5);
+
+    y = 60;
     const summaryItems = [
-      ["Total Income", formatPdfCurrency(summary.totalIncome)],
-      ["Total Expenses", formatPdfCurrency(-summary.totalExpenses)],
-      ["Closing Balance", formatPdfCurrency(summary.balance)],
+      {
+        label: "Total Income",
+        value: formatPdfCurrency(summary.totalIncome),
+        color: [22, 163, 74],
+      },
+      {
+        label: "Total Expenses",
+        value: formatPdfCurrency(summary.totalExpenses),
+        color: [220, 38, 38],
+      },
+      {
+        label: "Closing Balance",
+        value: formatPdfCurrency(summary.balance),
+        color: summary.balance >= 0 ? [22, 163, 74] : [220, 38, 38],
+      },
     ] as const;
 
     const summaryWidth = (contentWidth - 8) / 3;
-    summaryItems.forEach(([label, value], index) => {
+    summaryItems.forEach((item, index) => {
       const x = margin + index * (summaryWidth + 4);
       doc.setFillColor(248, 250, 252);
       doc.setDrawColor(226, 232, 240);
@@ -134,11 +171,11 @@ export function ReportExportActions({
       doc.setFont("helvetica", "normal");
       doc.setFontSize(8);
       doc.setTextColor(100, 116, 139);
-      doc.text(label, x + 4, y + 8);
+      doc.text(item.label, x + 4, y + 8);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(10);
-      doc.setTextColor(15, 23, 42);
-      doc.text(value, x + 4, y + 18);
+      doc.setTextColor(item.color[0], item.color[1], item.color[2]);
+      doc.text(item.value, x + 4, y + 18);
     });
 
     y += 36;
@@ -254,10 +291,7 @@ export function ReportExportActions({
         Excel
         <Download className="ml-2" size={15} />
       </button>
-      <span className="hidden items-center text-xs text-slate-500 lg:inline-flex">
-        <Download className="mr-1" size={14} />
-        Current filter only
-      </span>
+
     </div>
   );
 }

@@ -273,6 +273,18 @@ html.dark .bg-slate-200 {
   color: #e2e8f0 !important;
 }
 
+html.dark .nav-link,
+html.dark .mobile-nav-link {
+  color: #cbd5e1;
+}
+
+html.dark .nav-link:hover,
+html.dark .mobile-nav-link:hover {
+  border-color: #475569 !important;
+  background: #1e293b !important;
+  color: #f8fafc !important;
+}
+
 html.dark .text-slate-950,
 html.dark .text-slate-900,
 html.dark .text-slate-800 {

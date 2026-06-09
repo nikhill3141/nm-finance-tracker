@@ -1,7 +1,8 @@
 import { CalendarDays, FileText } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
-import { requireUserId } from "@/lib/auth-session";
+import { auth } from "@/auth";
 import { normalizePeriod } from "@/lib/date-filters";
 import { formatCurrency } from "@/lib/format";
 import { getMonthlyReport } from "@/lib/reports";
@@ -27,7 +28,13 @@ const periodLabels = {
 };
 
 export default async function ReportsPage({ searchParams }: ReportsPageProps) {
-  const userId = await requireUserId();
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    redirect("/sign-in");
+  }
+
+  const userId = session.user.id;
   const params = await searchParams;
   const period = normalizePeriod(params.period);
   const report = await getMonthlyReport(userId, period);
@@ -120,17 +127,17 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-lg bg-slate-950 p-2 shadow-2xl shadow-slate-300">
-        <article className="rounded-lg bg-[#fffdf7] p-4 text-slate-950 sm:p-8 lg:p-10">
-          <header className="flex flex-col gap-6 border-b border-slate-200 pb-6 md:flex-row md:items-start md:justify-between">
+      <div className="overflow-hidden rounded-lg bg-slate-950 p-2 shadow-2xl shadow-slate-300 dark:bg-slate-900 dark:shadow-black/40">
+        <article className="rounded-lg bg-[#fffdf7] p-4 text-slate-950 dark:bg-slate-950 dark:text-slate-100 sm:p-8 lg:p-10">
+          <header className="flex flex-col gap-6 border-b border-slate-200 pb-6 dark:border-slate-800 md:flex-row md:items-start md:justify-between">
             <div>
-              <p className="text-sm font-semibold text-slate-500">
+              <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">
                 NM Finance Tracker
               </p>
               <h2 className="mt-2 text-3xl font-semibold sm:text-4xl">
                 {periodLabels[report.period]} Statement
               </h2>
-              <p className="mt-3 flex items-center gap-2 text-sm text-slate-500">
+              <p className="mt-3 flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
                 <CalendarDays size={16} />
                 Generated on {generatedAt}
               </p>
@@ -145,6 +152,10 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
                 balance: report.balance,
               }}
               rows={exportRows}
+              user={{
+                name: session.user.name ?? "NM Finance User",
+                email: session.user.email ?? "No email available",
+              }}
             />
           </header>
 
@@ -152,7 +163,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
             {summaryCards.map((card) => (
               <div
                 key={card.label}
-                className="rounded-lg border border-slate-200 bg-white p-4"
+                className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900"
               >
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                   {card.label}
@@ -168,7 +179,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
             {statementRows.map((row) => (
               <article
                 key={`${row.type}-${row.id}`}
-                className="rounded-lg border border-slate-200 bg-white p-4"
+                className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
@@ -219,15 +230,15 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
             ))}
 
             {statementRows.length === 0 && (
-              <div className="rounded-lg border border-dashed border-slate-300 bg-white p-6 text-center text-sm text-slate-500">
+              <div className="rounded-lg border border-dashed border-slate-300 bg-white p-6 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
                 No transactions found for this period.
               </div>
             )}
           </div>
 
-          <div className="mt-8 hidden overflow-x-auto rounded-lg border border-slate-300 bg-white md:block">
-            <table className="w-full min-w-[760px] border-collapse text-left text-sm">
-              <thead className="bg-slate-100 text-xs uppercase tracking-wide text-slate-600">
+          <div className="mt-8 hidden overflow-x-auto rounded-lg border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-900 md:block">
+            <table className="w-full min-w-190 border-collapse text-left text-sm">
+              <thead className="bg-slate-100 text-xs uppercase tracking-wide text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                 <tr>
                   <th className="border-b border-slate-300 px-4 py-3">Date</th>
                   <th className="border-b border-slate-300 px-4 py-3">Type</th>
@@ -249,7 +260,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
                 {statementRows.map((row) => (
                   <tr
                     key={`${row.type}-${row.id}`}
-                    className="border-b border-slate-200"
+                    className="border-b border-slate-200 dark:border-slate-800"
                   >
                     <td className="px-4 py-3">
                       {row.date.toLocaleDateString("en-IN")}
@@ -296,7 +307,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
                   </tr>
                 )}
               </tbody>
-              <tfoot className="bg-[#efefef] font-semibold">
+              <tfoot className="bg-[#efefef] font-semibold dark:bg-slate-800">
                 <tr>
                   <td
                     colSpan={5}

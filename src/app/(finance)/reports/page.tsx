@@ -290,7 +290,6 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
                           : "text-rose-700"
                       }`}
                     >
-                      {row.type === "Income" ? "+" : "-"}
                       {formatCurrency(row.amount)}
                     </td>
                   </tr>

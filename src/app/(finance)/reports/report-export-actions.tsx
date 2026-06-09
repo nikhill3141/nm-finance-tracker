@@ -109,41 +109,73 @@ export function ReportExportActions({
       drawTableHeader();
     };
 
-    doc.setFillColor(248, 250, 252);
-    doc.rect(0, 0, pageWidth, 48, "F");
-    doc.setDrawColor(226, 232, 240);
-    doc.line(0, 48, pageWidth, 48);
-
-    doc.setFillColor(15, 23, 42);
-    doc.rect(pageWidth - margin - 42, 12, 42, 13, "F");
+    doc.setFillColor(255, 255, 255);
+    doc.rect(0, 0, pageWidth, 78, "F");
+    doc.setFillColor(64, 64, 64);
+    doc.rect(margin, 14, contentWidth, 12, "F");
+    doc.setDrawColor(255, 255, 255);
+    doc.setLineWidth(0.8);
+    doc.circle(margin + 6, 20, 2.8, "S");
+    doc.circle(margin + 10, 20, 2.8, "S");
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(8);
+    doc.setFontSize(11);
     doc.setTextColor(255, 255, 255);
-    doc.text("NM Finance", pageWidth - margin - 21, 20, { align: "center" });
-
-    doc.setFontSize(17);
-    doc.setTextColor(15, 23, 42);
-    doc.text("Financial Report", margin, y);
-    y += 7;
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8.5);
-    doc.setTextColor(100, 116, 139);
-    doc.text(`${periodLabel} cash flow statement`, margin, y);
-    doc.text(`Generated: ${generatedAt}`, pageWidth - margin, 32, {
+    doc.text("NM Finance", margin + 16, 21.5);
+    doc.setFontSize(10);
+    doc.text("NM Finance Tracker", pageWidth - margin - 4, 21.5, {
       align: "right",
     });
 
-    y += 9;
-    doc.setTextColor(100, 116, 139);
-    doc.text("Prepared for", margin, y);
     doc.setFont("helvetica", "bold");
+    doc.setFontSize(8.5);
     doc.setTextColor(15, 23, 42);
-    doc.text(cleanPdfText(user.name, 34), margin + 25, y);
+    doc.text(cleanPdfText(user.name, 38).toUpperCase(), margin, 35);
     doc.setFont("helvetica", "normal");
-    doc.setTextColor(100, 116, 139);
-    doc.text(cleanPdfText(user.email, 42), margin + 25, y + 5);
+    doc.setFontSize(8);
+    doc.setTextColor(51, 65, 85);
+    doc.text("Prepared for", margin, 43);
+    doc.text(cleanPdfText(user.email, 44), margin, 50);
+    doc.text("Personal finance statement", margin, 57);
+    doc.text("Currency: INR", margin, 64);
 
-    y = 60;
+    const metaX = margin + 104;
+    const metaValueX = metaX + 31;
+    const metaRows = [
+      ["Period", periodLabel],
+      ["Generated", generatedAt],
+      ["Report Type", "Cash Flow"],
+      ["Records", `${rows.length}`],
+      ["Income", formatPdfCurrency(summary.totalIncome)],
+      ["Expenses", formatPdfCurrency(summary.totalExpenses)],
+      ["Balance", formatPdfCurrency(summary.balance)],
+    ] as const;
+
+    doc.setFontSize(7.8);
+    metaRows.forEach(([label, value], index) => {
+      const rowY = 35 + index * 5.2;
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(100, 116, 139);
+      doc.text(label, metaX, rowY);
+      doc.text(":", metaValueX - 4, rowY);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(15, 23, 42);
+      doc.text(cleanPdfText(value, 30), metaValueX, rowY);
+    });
+
+    doc.setDrawColor(15, 23, 42);
+    doc.setLineWidth(0.4);
+    doc.line(margin, 75, pageWidth - margin, 75);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.setTextColor(15, 23, 42);
+    doc.text("Financial Report", margin, 84);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(71, 85, 105);
+    doc.text(`${periodLabel} cash flow statement`, margin + 35, 84);
+
+    y = 92;
     const summaryItems = [
       {
         label: "Total Income",

@@ -138,13 +138,13 @@ export default async function DashboardPage({
 
       <section className="overflow-hidden rounded-lg border border-slate-200 bg-slate-950 text-white shadow-2xl shadow-slate-300 dark:border-slate-800 dark:shadow-black/30">
         <div className="grid gap-0 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="flex min-h-64 flex-col justify-between p-5 sm:p-7">
+          <div className="flex flex-col justify-center p-5 sm:p-7">
             <div>
               <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-bold text-emerald-200">
                 <Wallet size={15} />
                 Available balance
               </p>
-              <h2 className="mt-5 text-4xl font-semibold sm:text-5xl">
+              <h2 className="mt-4 text-4xl font-semibold sm:text-5xl">
                 {formatCurrency(analytics.balance)}
               </h2>
             </div>

@@ -28,6 +28,19 @@ type ReportExportActionsProps = {
   rows: ReportRow[];
 };
 
+type RgbColor = readonly [number, number, number];
+
+const chartColors: RgbColor[] = [
+  [16, 185, 129],
+  [244, 63, 94],
+  [14, 165, 233],
+  [245, 158, 11],
+  [139, 92, 246],
+  [20, 184, 166],
+  [236, 72, 153],
+  [100, 116, 139],
+];
+
 function formatPdfCurrency(value: number) {
   const amount = Math.abs(value).toLocaleString("en-IN", {
     minimumFractionDigits: 2,
@@ -35,6 +48,34 @@ function formatPdfCurrency(value: number) {
   });
 
   return `Rs ${amount}`;
+}
+
+function getExpenseCategoryGraph(rows: ReportRow[]) {
+  const totals = rows
+    .filter((row) => row.type === "Expense")
+    .reduce<Record<string, number>>((categoryTotals, row) => {
+      const category = cleanPdfText(row.categoryOrSource || "Other", 24);
+      categoryTotals[category] = (categoryTotals[category] ?? 0) + row.amount;
+
+      return categoryTotals;
+    }, {});
+
+  const total = Object.values(totals).reduce((sum, amount) => sum + amount, 0);
+  const max = Math.max(...Object.values(totals), 0);
+  const categories = Object.entries(totals)
+    .map(([category, amount], index) => ({
+      category,
+      amount,
+      color: chartColors[index % chartColors.length],
+      percentage: total > 0 ? (amount / total) * 100 : 0,
+      barWidth: max > 0 ? (amount / max) * 100 : 0,
+    }))
+    .sort((a, b) => b.amount - a.amount);
+
+  return {
+    categories,
+    total,
+  };
 }
 
 function cleanPdfText(value: string, maxLength: number) {
@@ -240,6 +281,97 @@ export function ReportExportActions({
       doc.line(margin, y + 5, pageWidth - margin, y + 5);
       y += 10;
     });
+
+    doc.addPage();
+    y = 18;
+    const categoryGraph = getExpenseCategoryGraph(rows);
+
+    doc.setFillColor(15, 23, 42);
+    doc.rect(0, 0, pageWidth, 36, "F");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.setTextColor(255, 255, 255);
+    doc.text("Analytics", margin, y);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(203, 213, 225);
+    doc.text("Category-wise spending graph", margin, y + 8);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.text("NM Finance Tracker", pageWidth - margin, y, { align: "right" });
+
+    y = 50;
+    doc.setFillColor(248, 250, 252);
+    doc.setDrawColor(226, 232, 240);
+    doc.rect(margin, y, contentWidth, 28, "FD");
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(100, 116, 139);
+    doc.text("Total category spending", margin + 5, y + 9);
+    doc.text("Categories tracked", margin + 78, y + 9);
+    doc.text("Period", margin + 135, y + 9);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor(220, 38, 38);
+    doc.text(formatPdfCurrency(categoryGraph.total), margin + 5, y + 21);
+    doc.setTextColor(15, 23, 42);
+    doc.text(`${categoryGraph.categories.length}`, margin + 78, y + 21);
+    doc.text(periodLabel, margin + 135, y + 21);
+
+    y += 44;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.setTextColor(15, 23, 42);
+    doc.text("Category Breakdown", margin, y);
+    y += 9;
+
+    if (categoryGraph.categories.length === 0) {
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(100, 116, 139);
+      doc.text("No expense categories found for this period.", margin, y);
+    } else {
+      const labelX = margin;
+      const barX = margin + 38;
+      const barWidth = contentWidth - 92;
+      const amountX = pageWidth - margin;
+
+      categoryGraph.categories.forEach((category) => {
+        const [red, green, blue] = category.color;
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(8);
+        doc.setTextColor(15, 23, 42);
+        doc.text(cleanPdfText(category.category, 18), labelX, y + 4);
+
+        doc.setFillColor(226, 232, 240);
+        doc.roundedRect(barX, y, barWidth, 6, 2, 2, "F");
+        doc.setFillColor(red, green, blue);
+        doc.roundedRect(
+          barX,
+          y,
+          Math.max(3, (barWidth * category.barWidth) / 100),
+          6,
+          2,
+          2,
+          "F",
+        );
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(7.5);
+        doc.setTextColor(100, 116, 139);
+        doc.text(`${category.percentage.toFixed(1)}%`, barX, y + 12);
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(8);
+        doc.setTextColor(red, green, blue);
+        doc.text(formatPdfCurrency(category.amount), amountX, y + 4, {
+          align: "right",
+        });
+
+        y += 18;
+      });
+    }
 
     doc.save(`nm-finance-${fileSafePeriod}-report.pdf`);
   }

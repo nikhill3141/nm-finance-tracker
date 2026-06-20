@@ -100,7 +100,7 @@ export default async function DashboardPage({
       : { cash: 0, online: 0 };
 
   return (
-    <section className="animate-in space-y-6">
+    <section className="dashboard-premium-shell animate-in space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-sm font-medium text-emerald-700">
@@ -148,7 +148,6 @@ export default async function DashboardPage({
                 {formatCurrency(analytics.balance)}
               </h2>
             </div>
-
           </div>
 
           <div className="border-t border-white/10 p-5 sm:p-7 lg:border-l lg:border-t-0">

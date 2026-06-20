@@ -1,3 +1,4 @@
+import { Trash2 } from "lucide-react";
 import Link from "next/link";
 
 import { requireUserId } from "@/lib/auth-session";
@@ -40,11 +41,11 @@ export default async function IncomesPage() {
               </p>
             </div>
 
-            <div className="mt-4 flex items-center justify-between gap-3 text-sm">
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm">
               <span className="text-slate-500">
                 {income.transactionDate.toLocaleDateString("en-IN")}
               </span>
-              <div className="flex items-center gap-2">
+              <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
                 <Link href={`/incomes/${income.id}`} className="button-soft">
                   View
                 </Link>
@@ -54,6 +55,15 @@ export default async function IncomesPage() {
                 >
                   Edit
                 </Link>
+                <form action={deleteIncomeAction.bind(null, income.id)}>
+                  <button
+                    type="submit"
+                    className="button-soft text-red-600"
+                    aria-label={`Delete ${income.title}`}
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </form>
               </div>
             </div>
           </article>

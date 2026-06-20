@@ -4,19 +4,20 @@ import { redirect } from "next/navigation";
 
 import { auth, signOut } from "@/auth";
 import { ThemeToggle } from "./dashboard/theme-toggle";
+import { FinanceNavLinks } from "./finance-nav-links";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", shortLabel: "Home" },
   { href: "/incomes", label: "Incomes", shortLabel: "Income" },
   { href: "/expenses", label: "Expenses", shortLabel: "Expenses" },
-  { href: "/analytics", label: "Analytics", shortLabel: "Graph" },
+  { href: "/analytics", label: "Analytics", shortLabel: "Analytics" },
   { href: "/reports", label: "Reports", shortLabel: "Reports" },
 ];
 
 const mobileNavItems = [
   { href: "/dashboard", label: "Dashboard", shortLabel: "Home" },
   { href: "/expenses", label: "Expenses", shortLabel: "Expenses" },
-  { href: "/analytics", label: "Analytics", shortLabel: "Graph" },
+  { href: "/analytics", label: "Analytics", shortLabel: "Analytics" },
   { href: "/reports", label: "Reports", shortLabel: "Reports" },
 ];
 
@@ -52,18 +53,7 @@ export default async function FinanceLayout({
           </span>
         </Link>
 
-        <nav className="mt-8 flex flex-col gap-2">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              prefetch={false}
-              className="nav-link"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+        <FinanceNavLinks items={navItems} variant="desktop" />
 
         <div className="absolute inset-x-6 bottom-6 rounded-lg border border-slate-200 bg-slate-50 p-4">
           <div className="flex items-center gap-3">
@@ -132,35 +122,11 @@ export default async function FinanceLayout({
       </div>
 
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 px-3 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-2 shadow-[0_-12px_30px_rgba(15,23,42,0.08)] backdrop-blur md:hidden">
-        <div className="mx-auto grid max-w-md grid-cols-5 gap-1">
-          {mobileNavItems.slice(0, 2).map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              prefetch={false}
-              className="mobile-nav-link"
-            >
-              {item.shortLabel}
-            </Link>
-          ))}
-          <Link
-            href="/expenses/create"
-            prefetch={false}
-            className="grid min-h-12 place-items-center rounded-full bg-slate-950 px-3 text-sm font-semibold text-white shadow-lg shadow-slate-300 active:scale-95"
-          >
-            Add
-          </Link>
-          {mobileNavItems.slice(2).map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              prefetch={false}
-              className="mobile-nav-link"
-            >
-              {item.shortLabel}
-            </Link>
-          ))}
-        </div>
+        <FinanceNavLinks
+          addHref="/expenses/create"
+          items={mobileNavItems}
+          variant="mobile"
+        />
       </nav>
     </div>
   );

@@ -7,6 +7,31 @@ import { formatCurrency } from "@/lib/format";
 
 import { deleteExpenseAction } from "./actions";
 
+const categoryStyles = {
+  food: "bg-orange-50 text-orange-700 ring-orange-200 dark:bg-orange-950 dark:text-orange-200 dark:ring-orange-800",
+  rent: "bg-indigo-50 text-indigo-700 ring-indigo-200 dark:bg-indigo-950 dark:text-indigo-200 dark:ring-indigo-800",
+  travel: "bg-sky-50 text-sky-700 ring-sky-200 dark:bg-sky-950 dark:text-sky-200 dark:ring-sky-800",
+  shopping: "bg-fuchsia-50 text-fuchsia-700 ring-fuchsia-200 dark:bg-fuchsia-950 dark:text-fuchsia-200 dark:ring-fuchsia-800",
+  bills: "bg-amber-50 text-amber-700 ring-amber-200 dark:bg-amber-950 dark:text-amber-200 dark:ring-amber-800",
+  education: "bg-violet-50 text-violet-700 ring-violet-200 dark:bg-violet-950 dark:text-violet-200 dark:ring-violet-800",
+  health: "bg-emerald-50 text-emerald-700 ring-emerald-200 dark:bg-emerald-950 dark:text-emerald-200 dark:ring-emerald-800",
+  other: "bg-slate-100 text-slate-700 ring-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-700",
+};
+
+function CategoryBadge({
+  category,
+}: {
+  category: keyof typeof categoryStyles;
+}) {
+  return (
+    <span
+      className={`rounded-full px-3 py-1 text-xs font-bold capitalize ring-1 ${categoryStyles[category]}`}
+    >
+      {category}
+    </span>
+  );
+}
+
 function PaymentModeBadge({ mode }: { mode: "cash" | "online" }) {
   const Icon = mode === "cash" ? Banknote : CreditCard;
 
@@ -44,9 +69,7 @@ export default async function ExpensesPage() {
               <div>
                 <p className="font-semibold">{expense.title}</p>
                 <div className="mt-2 flex flex-wrap items-center gap-2">
-                  <span className="rounded-full bg-rose-50 px-3 py-1 text-xs font-bold capitalize text-rose-700">
-                    {expense.category}
-                  </span>
+                  <CategoryBadge category={expense.category} />
                   <PaymentModeBadge mode={expense.paymentMode} />
                 </div>
               </div>
@@ -109,7 +132,9 @@ export default async function ExpensesPage() {
             {expenses.map((expense) => (
               <tr key={expense.id} className="border-t border-slate-100">
                 <td className="px-4 py-3">{expense.title}</td>
-                <td className="px-4 py-3 capitalize">{expense.category}</td>
+                <td className="px-4 py-3">
+                  <CategoryBadge category={expense.category} />
+                </td>
                 <td className="px-4 py-3">
                   <PaymentModeBadge mode={expense.paymentMode} />
                 </td>

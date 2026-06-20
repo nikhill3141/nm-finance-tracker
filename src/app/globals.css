@@ -143,6 +143,17 @@ a:active {
   color: rgb(15 23 42);
 }
 
+.nav-link-active {
+  background: rgb(15 23 42);
+  color: white;
+  box-shadow: 0 12px 28px rgb(15 23 42 / 0.12);
+}
+
+.nav-link-active:hover {
+  background: rgb(15 23 42);
+  color: white;
+}
+
 .mobile-nav-link {
   display: grid;
   min-height: 3rem;
@@ -157,6 +168,17 @@ a:active {
 .mobile-nav-link:hover {
   background: rgb(241 245 249);
   color: rgb(15 23 42);
+}
+
+.mobile-nav-link-active {
+  background: rgb(15 23 42);
+  color: white;
+  box-shadow: 0 10px 22px rgb(15 23 42 / 0.14);
+}
+
+.mobile-nav-link-active:hover {
+  background: rgb(15 23 42);
+  color: white;
 }
 
 .empty-state {
@@ -283,6 +305,15 @@ html.dark .mobile-nav-link:hover {
   border-color: #475569 !important;
   background: #1e293b !important;
   color: #f8fafc !important;
+}
+
+html.dark .nav-link-active,
+html.dark .nav-link-active:hover,
+html.dark .mobile-nav-link-active,
+html.dark .mobile-nav-link-active:hover {
+  background: #f8fafc !important;
+  color: #020617 !important;
+  box-shadow: 0 14px 30px rgb(226 232 240 / 0.1);
 }
 
 html.dark .text-slate-950,

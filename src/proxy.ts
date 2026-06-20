@@ -7,6 +7,7 @@ export const config = {
     "/dashboard/:path*",
     "/incomes/:path*",
     "/expenses/:path*",
+    "/analytics/:path*",
     "/reports/:path*",
     "/sign-in",
   ],

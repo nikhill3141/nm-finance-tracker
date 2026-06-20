@@ -9,6 +9,14 @@ const navItems = [
   { href: "/dashboard", label: "Dashboard", shortLabel: "Home" },
   { href: "/incomes", label: "Incomes", shortLabel: "Income" },
   { href: "/expenses", label: "Expenses", shortLabel: "Expenses" },
+  { href: "/analytics", label: "Analytics", shortLabel: "Graph" },
+  { href: "/reports", label: "Reports", shortLabel: "Reports" },
+];
+
+const mobileNavItems = [
+  { href: "/dashboard", label: "Dashboard", shortLabel: "Home" },
+  { href: "/expenses", label: "Expenses", shortLabel: "Expenses" },
+  { href: "/analytics", label: "Analytics", shortLabel: "Graph" },
   { href: "/reports", label: "Reports", shortLabel: "Reports" },
 ];
 
@@ -125,7 +133,7 @@ export default async function FinanceLayout({
 
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 px-3 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-2 shadow-[0_-12px_30px_rgba(15,23,42,0.08)] backdrop-blur md:hidden">
         <div className="mx-auto grid max-w-md grid-cols-5 gap-1">
-          {navItems.slice(0, 2).map((item) => (
+          {mobileNavItems.slice(0, 2).map((item) => (
             <Link
               key={item.href}
               href={item.href}
@@ -142,7 +150,7 @@ export default async function FinanceLayout({
           >
             Add
           </Link>
-          {navItems.slice(2).map((item) => (
+          {mobileNavItems.slice(2).map((item) => (
             <Link
               key={item.href}
               href={item.href}

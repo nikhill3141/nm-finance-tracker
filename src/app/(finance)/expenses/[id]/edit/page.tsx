@@ -136,6 +136,16 @@ export default async function EditExpensePage({
                   <span className="block text-xs text-slate-500">
                     {mode.description}
                   </span>
+                  {mode.value === "online" ? (
+                    <span className="mt-2 flex flex-wrap gap-1.5">
+                      <span className="rounded-full bg-sky-50 px-2 py-0.5 text-[0.65rem] font-bold text-sky-700 dark:bg-sky-950 dark:text-sky-200">
+                        GPay
+                      </span>
+                      <span className="rounded-full bg-violet-50 px-2 py-0.5 text-[0.65rem] font-bold text-violet-700 dark:bg-violet-950 dark:text-violet-200">
+                        PhonePe
+                      </span>
+                    </span>
+                  ) : null}
                 </span>
                 <span className="absolute inset-0 rounded-lg ring-0 ring-emerald-400 transition peer-checked:ring-2" />
               </label>

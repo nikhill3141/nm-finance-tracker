@@ -11,7 +11,13 @@ import {
   verificationTokens,
 } from "@/db/schema";
 
-const protectedRoutes = ["/dashboard", "/incomes", "/expenses", "/reports"];
+const protectedRoutes = [
+  "/dashboard",
+  "/incomes",
+  "/expenses",
+  "/analytics",
+  "/reports",
+];
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: DrizzleAdapter(db, {

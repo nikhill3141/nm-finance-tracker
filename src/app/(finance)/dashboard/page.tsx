@@ -1,8 +1,11 @@
 import {
   ArrowDownLeft,
   Banknote,
-  CreditCard,
+  BarChart3,
+  ChevronRight,
+  PieChart,
   ReceiptText,
+  Smartphone,
   TrendingDown,
   TrendingUp,
   Wallet,
@@ -30,6 +33,25 @@ const periodLinks = [
   { label: "All Time", value: "all" },
 ];
 
+function OnlinePaymentBadges() {
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-2">
+      <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1 text-[0.7rem] font-bold text-sky-100 ring-1 ring-white/10">
+        <span className="grid size-5 place-items-center rounded-full bg-white text-[0.62rem] font-black text-sky-700">
+          G
+        </span>
+        GPay
+      </span>
+      <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1 text-[0.7rem] font-bold text-violet-100 ring-1 ring-white/10">
+        <span className="grid size-5 place-items-center rounded-full bg-violet-500 text-[0.58rem] font-black text-white">
+          Pe
+        </span>
+        PhonePe
+      </span>
+    </div>
+  );
+}
+
 export default async function DashboardPage({
   searchParams,
 }: DashboardPageProps) {
@@ -37,41 +59,35 @@ export default async function DashboardPage({
   const params = await searchParams;
   const period = normalizePeriod(params.period);
   const analytics = await getDashboardAnalytics(userId, period);
+  const trendBars = analytics.expenseTrend.slice(-7);
+  const categoryBars = analytics.categoryBreakdown.slice(0, 4);
 
   const cards = [
     {
       label: "Total Income",
       value: formatCurrency(analytics.totalIncome),
+      helper: `${analytics.incomeCount} income records`,
       tone: "text-emerald-700",
       icon: TrendingUp,
+      href: "/incomes",
     },
     {
       label: "Total Expenses",
       value: formatCurrency(analytics.totalExpenses),
+      helper: `${analytics.expenseCount} expense records`,
       tone: "text-rose-700",
       icon: TrendingDown,
-    },
-    {
-      label: "Cash Expenses",
-      value: formatCurrency(analytics.cashExpenses),
-      tone: "text-amber-700",
-      icon: Banknote,
-    },
-    {
-      label: "Online Expenses",
-      value: formatCurrency(analytics.onlineExpenses),
-      tone: "text-sky-700",
-      icon: CreditCard,
+      href: "/expenses",
     },
     {
       label: "Max Expense",
       value: analytics.maxExpense
-        ? `${analytics.maxExpense.title} - ${formatCurrency(
-            Number(analytics.maxExpense.amount),
-          )}`
+        ? formatCurrency(Number(analytics.maxExpense.amount))
         : "No expenses",
+      helper: analytics.maxExpense?.title ?? "Add expenses to compare",
       tone: "text-slate-950",
       icon: ReceiptText,
+      href: "/expenses",
     },
   ];
 
@@ -120,22 +136,44 @@ export default async function DashboardPage({
         </div>
       </div>
 
-      <section className="overflow-hidden rounded-lg border border-slate-200 bg-slate-950 text-white shadow-2xl shadow-slate-300">
+      <section className="overflow-hidden rounded-lg border border-slate-200 bg-slate-950 text-white shadow-2xl shadow-slate-300 dark:border-slate-800 dark:shadow-black/30">
         <div className="grid gap-0 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="p-5 sm:p-7">
-            <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-bold text-emerald-200">
-              <Wallet size={15} />
-              Available balance
-            </p>
-            <h2 className="mt-5 text-4xl font-semibold sm:text-5xl">
-              {formatCurrency(analytics.balance)}
-            </h2>
+          <div className="flex min-h-64 flex-col justify-between p-5 sm:p-7">
+            <div>
+              <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-bold text-emerald-200">
+                <Wallet size={15} />
+                Available balance
+              </p>
+              <h2 className="mt-5 text-4xl font-semibold sm:text-5xl">
+                {formatCurrency(analytics.balance)}
+              </h2>
+            </div>
 
+            <div className="mt-8 grid gap-3 sm:grid-cols-2">
+              <Link
+                href="/incomes"
+                className="rounded-lg border border-white/10 bg-white/5 p-4 transition hover:bg-white/10"
+              >
+                <p className="text-sm text-slate-300">Income flow</p>
+                <p className="mt-2 text-xl font-semibold text-emerald-200">
+                  {formatCurrency(analytics.totalIncome)}
+                </p>
+              </Link>
+              <Link
+                href="/expenses"
+                className="rounded-lg border border-white/10 bg-white/5 p-4 transition hover:bg-white/10"
+              >
+                <p className="text-sm text-slate-300">Expense flow</p>
+                <p className="mt-2 text-xl font-semibold text-rose-200">
+                  {formatCurrency(analytics.totalExpenses)}
+                </p>
+              </Link>
+            </div>
           </div>
 
           <div className="border-t border-white/10 p-5 sm:p-7 lg:border-l lg:border-t-0">
-            <div className="grid grid-cols-2 gap-3">
-              <div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="rounded-lg border border-white/10 bg-white/5 p-4">
                 <p className="flex items-center gap-2 text-sm text-slate-300">
                   <Banknote size={16} />
                   Cash
@@ -144,14 +182,15 @@ export default async function DashboardPage({
                   {formatCurrency(analytics.cashExpenses)}
                 </p>
               </div>
-              <div>
+              <div className="rounded-lg border border-white/10 bg-white/5 p-4">
                 <p className="flex items-center gap-2 text-sm text-slate-300">
-                  <CreditCard size={16} />
+                  <Smartphone size={16} />
                   Online
                 </p>
                 <p className="mt-2 text-2xl font-semibold text-sky-300">
                   {formatCurrency(analytics.onlineExpenses)}
                 </p>
+                <OnlinePaymentBadges />
               </div>
             </div>
 
@@ -170,62 +209,110 @@ export default async function DashboardPage({
             <p className="mt-4 flex items-center gap-2 text-sm text-slate-300">
               <ArrowDownLeft size={16} />
               {analytics.totalExpenses > 0
-                ? "Expense split for this period"
+                ? "Cash and online split for this period"
                 : "Add expenses to see your payment split"}
             </p>
           </div>
         </div>
       </section>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-3">
         {cards.map((card) => (
-          <div
-            key={card.label}
-            className={`panel p-5 ${
-              card.label === "Max Expense" ? "sm:col-span-2 xl:col-span-2" : ""
-            }`}
-          >
-            <div className="flex items-center justify-between gap-4">
-              <p className="text-sm text-slate-500">{card.label}</p>
-              <span className="grid size-10 place-items-center rounded-full bg-slate-100 text-slate-700">
+          <Link key={card.label} href={card.href} className="panel group p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-sm text-slate-500">{card.label}</p>
+                <p className={`mt-3 text-2xl font-semibold ${card.tone}`}>
+                  {card.value}
+                </p>
+              </div>
+              <span className="grid size-10 place-items-center rounded-full bg-slate-100 text-slate-700 transition group-hover:bg-slate-950 group-hover:text-white">
                 <card.icon size={18} />
               </span>
             </div>
-            <p className={`mt-3 text-2xl font-semibold ${card.tone}`}>
-              {card.value}
+            <p className="mt-4 flex items-center justify-between gap-2 text-sm text-slate-500">
+              <span className="truncate">{card.helper}</span>
+              <ChevronRight size={16} className="shrink-0" />
             </p>
-          </div>
+          </Link>
         ))}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="panel p-5">
-          <h2 className="font-semibold">Top Spending Category</h2>
-          <p className="mt-3 text-2xl font-semibold capitalize">
+      <div className="grid gap-4 lg:grid-cols-[1.35fr_0.65fr]">
+        <Link href="/analytics" className="panel group p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500">
+                <BarChart3 size={16} />
+                Expense graph
+              </p>
+              <h2 className="mt-2 text-xl font-semibold">Spending pulse</h2>
+            </div>
+            <span className="inline-flex items-center gap-1 text-sm font-semibold text-emerald-700">
+              View analytics
+              <ChevronRight size={16} />
+            </span>
+          </div>
+
+          <div className="mt-6 flex h-48 items-end gap-2 rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
+            {trendBars.length > 0 ? (
+              trendBars.map((item) => (
+                <div
+                  key={item.date}
+                  className="flex h-full flex-1 flex-col justify-end gap-2"
+                >
+                  <div className="flex flex-1 items-end">
+                    <span
+                      className="w-full rounded-t-lg bg-rose-500/85 transition group-hover:bg-rose-500"
+                      style={{ height: `${Math.max(item.percentage, 8)}%` }}
+                    />
+                  </div>
+                  <p className="truncate text-center text-[0.68rem] font-semibold text-slate-500">
+                    {item.label}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <div className="grid h-full w-full place-items-center text-center text-sm text-slate-500">
+                Add expenses to build your graph.
+              </div>
+            )}
+          </div>
+        </Link>
+
+        <Link href="/expenses" className="panel p-5">
+          <p className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500">
+            <PieChart size={16} />
+            Top category
+          </p>
+          <h2 className="mt-3 text-2xl font-semibold capitalize">
             {analytics.topCategory
               ? analytics.topCategory.category
               : "No expenses"}
-          </p>
+          </h2>
           <p className="text-sm text-slate-500">
             {analytics.topCategory
               ? formatCurrency(analytics.topCategory.amount)
               : "Add expenses to see category insights."}
           </p>
-        </div>
 
-        <div className="panel p-5">
-          <h2 className="font-semibold">Records</h2>
-          <div className="mt-3 grid grid-cols-2 gap-3">
-            <div>
-              <p className="text-sm text-slate-500">Income Records</p>
-              <p className="text-2xl font-semibold">{analytics.incomeCount}</p>
-            </div>
-            <div>
-              <p className="text-sm text-slate-500">Expense Records</p>
-              <p className="text-2xl font-semibold">{analytics.expenseCount}</p>
-            </div>
+          <div className="mt-5 space-y-3">
+            {categoryBars.map((category) => (
+              <div key={category.category}>
+                <div className="mb-1 flex items-center justify-between gap-3 text-xs font-semibold capitalize text-slate-500">
+                  <span>{category.category}</span>
+                  <span>{formatCurrency(category.amount)}</span>
+                </div>
+                <div className="h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                  <span
+                    className="block h-full rounded-full bg-emerald-500"
+                    style={{ width: `${category.percentage}%` }}
+                  />
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+        </Link>
       </div>
     </section>
   );

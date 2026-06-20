@@ -113,25 +113,27 @@ export function ToastProvider() {
         const Icon = toast.type === "success" ? CheckCircle2 : CircleAlert;
         const tone =
           toast.type === "success"
-            ? "border-emerald-200 bg-emerald-50 text-emerald-950"
-            : "border-rose-200 bg-rose-50 text-rose-950";
+            ? "border-emerald-200 bg-emerald-50 text-emerald-950 dark:border-emerald-400/35 dark:bg-slate-950 dark:text-emerald-100"
+            : "border-rose-200 bg-rose-50 text-rose-950 dark:border-rose-400/40 dark:bg-slate-950 dark:text-rose-100";
 
         return (
           <div
             key={toast.id}
-            className={`flex min-h-14 items-center gap-3 rounded-lg border px-4 py-3 shadow-lg shadow-slate-900/10 ${tone}`}
+            className={`flex min-h-14 items-center gap-3 rounded-lg border px-4 py-3 shadow-lg shadow-slate-900/10 backdrop-blur dark:shadow-black/30 ${tone}`}
           >
             <Icon
               size={20}
               className={
-                toast.type === "success" ? "text-emerald-600" : "text-rose-600"
+                toast.type === "success"
+                  ? "text-emerald-600 dark:text-emerald-300"
+                  : "text-rose-600 dark:text-rose-300"
               }
             />
             <p className="flex-1 text-sm font-semibold">{toast.message}</p>
             <button
               type="button"
               onClick={() => removeToast(toast.id)}
-              className="grid size-7 place-items-center rounded-full hover:bg-black/5"
+              className="grid size-7 place-items-center rounded-full hover:bg-black/5 dark:hover:bg-white/10"
               aria-label="Close toast"
             >
               <X size={15} />

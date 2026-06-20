@@ -3,7 +3,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #f8fafc;
+  --background: #f3f6f4;
   --foreground: #0f172a;
 }
 
@@ -65,7 +65,7 @@ a:active {
 .panel {
   border: 1px solid rgb(226 232 240);
   border-radius: 0.5rem;
-  background: rgb(255 255 255);
+  background: rgb(250 252 249);
   box-shadow: 0 10px 30px rgb(15 23 42 / 0.05);
 }
 
@@ -205,9 +205,60 @@ a:active {
 .empty-state {
   border: 1px dashed rgb(203 213 225);
   border-radius: 0.5rem;
-  background: rgb(255 255 255 / 0.7);
+  background: rgb(250 252 249 / 0.72);
   padding: 1.5rem;
   text-align: center;
+}
+
+.dashboard-glass-shell {
+  position: relative;
+  isolation: isolate;
+}
+
+.dashboard-glass-shell::before {
+  content: "";
+  position: absolute;
+  inset: -1.25rem -0.75rem;
+  z-index: -1;
+  border-radius: 1rem;
+  background: linear-gradient(
+    180deg,
+    rgb(236 242 239 / 0.68),
+    rgb(245 248 245 / 0.34) 44%,
+    rgb(245 248 245 / 0)
+  );
+  pointer-events: none;
+}
+
+.dashboard-glass-shell .panel,
+.dashboard-filter-pill,
+.dashboard-chart-surface {
+  border-color: rgb(203 213 225 / 0.72);
+  background: rgb(250 252 249 / 0.7);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.58),
+    0 18px 44px rgb(15 23 42 / 0.07);
+  backdrop-filter: blur(18px) saturate(128%);
+}
+
+.dashboard-glass-shell .panel:hover {
+  border-color: rgb(148 163 184 / 0.82);
+  background: rgb(252 253 250 / 0.8);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.68),
+    0 22px 54px rgb(15 23 42 / 0.09);
+}
+
+.dashboard-filter-pill {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.62),
+    0 12px 30px rgb(15 23 42 / 0.055);
+}
+
+.dashboard-balance-card {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.08),
+    0 30px 70px rgb(15 23 42 / 0.22);
 }
 
 .landing-auth-button {
@@ -338,6 +389,35 @@ html.dark .mobile-nav-link-active:hover {
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.08),
     0 14px 30px rgb(0 0 0 / 0.16);
+}
+
+html.dark .dashboard-glass-shell::before {
+  background: linear-gradient(
+    180deg,
+    rgb(15 23 42 / 0.58),
+    rgb(2 6 23 / 0.18) 54%,
+    rgb(2 6 23 / 0)
+  );
+}
+
+html.dark .dashboard-glass-shell .panel,
+html.dark .dashboard-filter-pill,
+html.dark .dashboard-chart-surface {
+  border-color: rgb(148 163 184 / 0.16) !important;
+  background: rgb(15 23 42 / 0.58) !important;
+  color: #e2e8f0 !important;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.07),
+    0 20px 48px rgb(0 0 0 / 0.22);
+  backdrop-filter: blur(18px) saturate(130%);
+}
+
+html.dark .dashboard-glass-shell .panel:hover {
+  border-color: rgb(148 163 184 / 0.24) !important;
+  background: rgb(15 23 42 / 0.68) !important;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.08),
+    0 24px 56px rgb(0 0 0 / 0.28);
 }
 
 html.dark .text-slate-950,

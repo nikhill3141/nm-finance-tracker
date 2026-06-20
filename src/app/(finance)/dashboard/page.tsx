@@ -100,7 +100,7 @@ export default async function DashboardPage({
       : { cash: 0, online: 0 };
 
   return (
-    <section className="animate-in space-y-6">
+    <section className="dashboard-glass-shell animate-in space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-sm font-medium text-emerald-700">
@@ -114,7 +114,7 @@ export default async function DashboardPage({
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="flex overflow-x-auto rounded-full border border-slate-200 bg-white p-1 shadow-sm">
+          <div className="dashboard-filter-pill flex overflow-x-auto rounded-full border p-1">
             {periodLinks.map((link) => (
               <Link
                 key={link.value}
@@ -136,7 +136,7 @@ export default async function DashboardPage({
         </div>
       </div>
 
-      <section className="overflow-hidden rounded-lg border border-slate-200 bg-slate-950 text-white shadow-2xl shadow-slate-300 dark:border-slate-800 dark:shadow-black/30">
+      <section className="dashboard-balance-card overflow-hidden rounded-lg border border-slate-200 bg-slate-950 text-white dark:border-slate-800">
         <div className="grid gap-0 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="flex flex-col justify-center p-5 sm:p-7">
             <div>
@@ -233,7 +233,7 @@ export default async function DashboardPage({
             </span>
           </div>
 
-          <div className="mt-6 flex h-48 items-end gap-2 rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
+          <div className="dashboard-chart-surface mt-6 flex h-48 items-end gap-2 rounded-lg border p-4">
             {trendBars.length > 0 ? (
               trendBars.map((item) => (
                 <div
